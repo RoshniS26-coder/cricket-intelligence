@@ -54,50 +54,70 @@ cricket-intelligence/
 ├── CLAUDE.md                       ← this file
 ├── README.md                       ← user-facing readme
 ├── pyproject.toml, requirements.txt
-├── run_pipeline.py                 ← legacy chunk-mode orchestrator (kept; not part of active flow)
 │
-├── src/                            ← reusable libraries
-│   ├── analytics/
+│ === SHARED INFRASTRUCTURE ===
+├── src/                            ← libraries used by BOTH products
+│   ├── analytics/                  (shared rendering)
 │   │   ├── pitch_map.py            ← DANGER heatmap renderer (weakness-aware)
-│   │   ├── heatmaps.py             ← FREQUENCY heatmap + wagon wheel (newer, generic)
-│   │   ├── weakness.py             ← per-batter weakness aggregation
-│   │   └── briefing.py             ← AI coaching narrative generator
+│   │   ├── heatmaps.py             ← FREQUENCY heatmap + wagon wheel
+│   │   └── weakness.py             ← per-batter weakness aggregation
 │   ├── intelligence/
+│   │   └── schema.py               ← Pydantic + Gemini JSON schemas (used by both)
+│   ├── storage/db.py               ← SQLAlchemy models + CricketDB class
+│   ├── validation/normalizer.py    ← shared field normalizer
+│   ├── api/main.py                 ← REST API (Match-side weakness analysis)
+│   ├── ingestion/, segmentation/   ← (unused by active code; legacy infrastructure)
+│   └── detection/                  ← (moved to CV_Enhancements/)
+│
+│ === PRODUCT 1: MATCH INTELLIGENCE ===
+├── match_intelligence/             ← T20/ODI broadcast match analytics
+│   ├── lib/                        ← Match-specific libraries
 │   │   ├── cricsheet.py            ← Cricsheet loader + innings/ball helpers
 │   │   ├── espn_commentary.py      ← Parse ESPN JSON → join to Cricsheet ball_ids
-│   │   ├── extractor.py            ← Gemini-on-video extractor (used by run_pipeline.py)
-│   │   ├── prompt_synthesis.py     ← ⭐ ACTIVE — text-only synthesis prompt (gemini-2.5-pro)
-│   │   └── schema.py               ← Pydantic + Gemini JSON schemas
-│   ├── storage/db.py               ← SQLAlchemy models + CricketDB class
-│   ├── segmentation/               ← Video clip extraction
-│   ├── detection/                  ← (moved to CV_Enhancements/)
-│   └── validation/normalizer.py
+│   │   ├── synthesis_prompt.py     ← ⭐ ACTIVE — text-only synthesis prompt (gemini-2.5-pro)
+│   │   ├── extractor.py            ← Gemini-on-video extractor
+│   │   ├── weakness_narrator.py    ← bilingual narrative on weakness profiles
+│   │   └── commentary.py
+│   ├── pipeline/                   ← Match data ingestion CLIs
+│   │   ├── export_cricsheet_innings.py
+│   │   ├── import_cricsheet.py
+│   │   ├── synthesize_match_json.py  ← ⭐ THE active pipeline entrypoint
+│   │   ├── parse_espn_pdf.py
+│   │   └── transcribe.py
+│   └── reports/                    ← Match analysis CLIs
+│       ├── batsman_report.py
+│       ├── bowler_report.py
+│       ├── analyse_batsman_weakness.py
+│       ├── generate_heatmaps.py
+│       └── run_weakness.sh
 │
-├── features/                       ← CLI scripts grouped by feature
-│   ├── ball_extraction/            ← ⭐ ACTIVE pipeline (4 files only)
-│   │   ├── export_cricsheet_innings.py ← cricsheet match JSON → one innings JSON
-│   │   ├── import_cricsheet.py         ← bulk cricsheet importer
-│   │   └── synthesize_match_json.py    ← TEXT-ONLY synth (cricsheet + ESPN + opt video)
-│   ├── audio_pipeline/
-│   │   ├── parse_espn_pdf.py       ← ESPN PDF → structured commentary JSON
-│   │   └── transcribe.py           ← faster-whisper audio transcription
-│   ├── bowler_analysis/
-│   │   └── bowler_report.py        ← per-bowler stats + matchups + markdown/JSON
-│   ├── batsman_analysis/
-│   │   ├── analyse_batsman_weakness.py ← danger-map analysis (uses pitch_map.py)
-│   │   ├── batsman_report.py           ← per-batter stats + matchups + markdown/JSON
-│   │   └── run_weakness.sh
-│   ├── heatmap/
-│   │   └── generate_heatmaps.py    ← bulk pitch maps + wagon wheels for all players
-│   ├── rendering/                  ← side-by-side video comparisons
-│   ├── pose_analysis/              ← OpenPose-derived pose data
-│   ├── coaching_corpus/            ← coaching video tagged corpus
-│   ├── ai_coach_briefing/          ← AI-generated coaching briefs
-│   ├── critiques/
-│   └── db_migrations/
+│ === PRODUCT 2: AI COACH ===
+├── ai_coach/                       ← Student critique + briefing + pose analysis
+│   ├── lib/                        ← Coach-specific libraries
+│   │   ├── coaching_extractor.py, coaching_loader.py, coaching_prompts.py
+│   │   ├── critique_prompts.py, few_shot_critique.py
+│   │   ├── session_catalog.py
+│   │   ├── briefing.py             ← PlayerBriefing assembler
+│   │   └── pose/                   ← (was src/pose/)
+│   │       ├── extractor.py, smoothing.py
+│   │       └── features/batsman.py
+│   ├── briefing/                   ← AI Coach briefing CLI (PDF generator)
+│   │   ├── render_player_briefing.py
+│   │   ├── preview_coach_briefing.py
+│   │   ├── run_briefing.sh, run_preview.sh
+│   ├── pipeline/
+│   │   ├── critiques/              ← critique_student_clip + multi_shot_session
+│   │   └── coaching_corpus/        ← extract_coaching_video + add_reference_clip
+│   ├── pose/                       ← pose render CLI
+│   │   ├── render_ball_video.py, run_render.sh
+│   ├── rendering/                  ← side-by-side video compare
+│   └── report/                     ← (was src/report/) — PDF / TTS / video mux
+│       └── pdf.py, mux.py, tts.py, video_renderer.py
 │
-├── scripts/                        ← one-off operational scripts
-│   └── load_synth_to_db.py         ← load synthesized JSON into DB (wipe + insert)
+│ === SHARED OPS / UI ===
+├── scripts/                        ← one-off ops + DB migrations
+│   ├── load_synth_to_db.py         ← load Match synthesized JSON into DB
+│   └── db_migrations/              ← idempotent SQLite migrations
 │
 ├── ui/
 │   └── app.py                      ← Streamlit UI (Weakness Analysis + Full Dataset)
@@ -186,11 +206,25 @@ For up-to-date state, see `docs/project_context.md`.
   The synthesis pipeline is the current path. Old experiments live in `archive/`.
 
 ### Where to put new code
-- A new analysis lens (per-team, per-tournament, etc.) → `features/<feature_name>/<name>_report.py`
-- A new data source loader → `src/intelligence/<source>.py`
-- A new visualisation → `src/analytics/<type>.py`
-- A one-off script → `scripts/<name>.py`
+**For Match Intelligence (the T20/ODI analytics product):**
+- A new analysis lens → `match_intelligence/reports/<name>_report.py`
+- A new data source loader → `match_intelligence/lib/<source>.py`
+- A new pipeline step → `match_intelligence/pipeline/<name>.py`
+
+**For AI Coach (student critique / briefing product):**
+- A new coach library → `ai_coach/lib/<name>.py`
+- A new coach CLI → `ai_coach/pipeline/<feature>/<name>.py` or `ai_coach/briefing/<name>.py`
+
+**Shared (both products):**
+- A new shared visualisation → `src/analytics/<type>.py`
+- A new shared schema/enum → `src/intelligence/schema.py`
+- A new shared validator → `src/validation/<name>.py`
+- A one-off ops script → `scripts/<name>.py`
+- A DB migration → `scripts/db_migrations/migrate_<change>.py`
 - A new doc/explainer → `docs/<topic>.md`
+
+**Rule:** Match should never import from `ai_coach.*`. Coach may optionally
+import from `match_intelligence.*` (currently doesn't). Both freely use `src/`.
 
 ### Git
 - Branch: `main` (no PR workflow established yet — direct commits)
@@ -206,7 +240,7 @@ For up-to-date state, see `docs/project_context.md`.
 # Manually: cricsheet.org → download → put under data/cricsheet/<match_dir>/
 
 # 2. Export one innings (or both)
-python features/ball_extraction/export_cricsheet_innings.py \
+python match_intelligence/pipeline/export_cricsheet_innings.py \
     --cricsheet-id <id> --innings <Team> --out data/cricsheet/<dir>/<team>_innings.json
 
 # 3. Save ESPN PDF manually
@@ -215,17 +249,17 @@ python features/ball_extraction/export_cricsheet_innings.py \
 # → drop in data/espncricinfo/
 
 # 4. Parse the PDF
-python features/audio_pipeline/parse_espn_pdf.py \
+python match_intelligence/pipeline/parse_espn_pdf.py \
     --pdf "data/espncricinfo/<file>.pdf" \
     --out data/espncricinfo/<match_dir>/match_<id>_innings<n>_commentary.json \
     --match-id <id>
 
 # 5. (Optional) Process video chunks for the "bowling speed + crease" fields
 # Only worth it for bowler-side analysis. ~$5 + 2-3 hrs per innings.
-# See features/ball_extraction/extract_with_cricsheet.py + run_pipeline.py
+# Legacy chunk-mode in archive/chunk_mode_pipeline/.
 
 # 6. Synthesise — text-only, ~$0.50, ~17 min per innings
-python features/ball_extraction/synthesize_match_json.py \
+python match_intelligence/pipeline/synthesize_match_json.py \
     --cricsheet-json data/cricsheet/<dir>/<team>_innings.json \
     --espn-commentary data/espncricinfo/<dir>/match_<id>_innings<n>_commentary.json \
     --gemini-video-glob 'data/<label>_chunk*_with_cricsheet.json' \  # or 'data/NONEXISTENT_chunk*.json' if no video
@@ -240,12 +274,12 @@ python scripts/load_synth_to_db.py \
     [--skip-wipe if a second innings of same match]
 
 # 8. Generate analysis (any of these stand-alone)
-python features/bowler_analysis/bowler_report.py --match-id <id> --innings <n> --out data/bowler_analysis/...
-python features/batsman_analysis/batsman_report.py --match-id <id> --innings <n> --out data/batsman_analysis/...
-python features/heatmap/generate_heatmaps.py --match-id <id> --innings <n> --out-dir data/heatmaps/...
+python match_intelligence/reports/bowler_report.py --match-id <id> --innings <n> --out data/bowler_analysis/...
+python match_intelligence/reports/batsman_report.py --match-id <id> --innings <n> --out data/batsman_analysis/...
+python match_intelligence/reports/generate_heatmaps.py --match-id <id> --innings <n> --out-dir data/heatmaps/...
 
-# 9. Export combined CSV from DB
-python -c "from src.storage.db import CricketDB; from features.ball_extraction.merge_and_save_to_db import export_csv; export_csv('<id>', 'data/<label>_full.csv', CricketDB())"
+# 9. Export combined CSV from DB via the Streamlit UI's CSV export button
+# (or write a small SQL → pandas snippet against data/cricket_intelligence.db)
 
 # 10. Update project context — at session end
 # (Type the /update-context slash command and follow the template)

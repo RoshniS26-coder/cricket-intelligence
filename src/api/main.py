@@ -100,6 +100,44 @@ def analytics_summary(match_id: Optional[str] = None):
     return db.get_stats(match_id)
 
 
+@app.get("/analytics/weakness")
+def batsman_weakness(
+    batsman_name: Optional[str] = None,
+    match_id: Optional[str] = None,
+    min_confidence: float = Query(default=0.5, ge=0.0, le=1.0),
+    narrative: bool = False,
+):
+    """
+    Return a weakness zone profile (line × length danger scores) for a batsman.
+
+    - batsman_name: partial match, case-insensitive. Omit to get all batsmen list.
+    - narrative: if true, calls Gemini for bilingual coaching narrative (slower).
+    """
+    from src.analytics.weakness import compute_weakness_profile
+
+    if not batsman_name:
+        return {"batsmen": db.list_batsmen(match_id)}
+
+    balls = db.get_balls_for_batsman(
+        batsman_name=batsman_name,
+        match_id=match_id,
+        min_confidence=min_confidence,
+    )
+    if not balls:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No qualifying balls found for '{batsman_name}' (confidence ≥ {min_confidence}).",
+        )
+
+    profile = compute_weakness_profile(balls, batsman_name=batsman_name)
+
+    if narrative:
+        from match_intelligence.lib.weakness_narrator import narrate_weakness
+        profile["narrative"] = narrate_weakness(profile)
+
+    return profile
+
+
 @app.get("/clips/{ball_id}")
 def serve_clip(ball_id: str):
     ball = db.get_ball(ball_id)

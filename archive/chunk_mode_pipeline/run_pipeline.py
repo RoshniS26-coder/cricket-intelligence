@@ -5,6 +5,7 @@ Orchestrates the full pipeline: ingest → segment → extract → validate → 
 
 import argparse
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -12,6 +13,28 @@ from rich.console import Console
 from rich.panel import Panel
 
 console = Console()
+
+
+def _video_duration(video_path: str) -> float:
+    result = subprocess.run(
+        ["ffprobe", "-v", "quiet", "-print_format", "json", "-show_format", video_path],
+        capture_output=True, text=True, check=True,
+    )
+    return float(json.loads(result.stdout)["format"]["duration"])
+
+
+def _cut_chunk(video_path: str, start_sec: float, duration: float, out_path: str) -> bool:
+    result = subprocess.run(
+        [
+            "ffmpeg", "-y",
+            "-ss", str(start_sec), "-i", video_path,
+            "-t", str(duration),
+            "-c", "copy", "-avoid_negative_ts", "make_zero",
+            out_path,
+        ],
+        capture_output=True, text=True,
+    )
+    return result.returncode == 0
 
 
 def run_full_pipeline(
@@ -27,11 +50,18 @@ def run_full_pipeline(
     max_clips: int = 30,
     gemini_model: str = "gemini-2.5-flash",
     skip_extraction: bool = False,
-    use_cv_detection: bool = True,
-    cv_frame_offset: float = 0.4,
-    batch_mode: bool = False,            # NEW: send full video to Gemini, skip segmentation
+    batch_mode: bool = False,            # send full video to Gemini, skip segmentation
+    batsman_name: str = None,            # Override batsman_name for all extracted balls
+    chunk_mode: bool = False,            # Gemini chunk segmentation → timestamps → per-clip extraction
+    chunk_duration: float = 90.0,        # seconds per chunk sent to Gemini
 ):
-    """Run the complete cricket intelligence pipeline."""
+    """Run the complete cricket intelligence pipeline.
+
+    The CV-augmented variant — `--cv-segment` mode (OpenCV delivery tracker),
+    `--no-cv` toggle, and Step 2.5 Roboflow line/length pre-analysis — is
+    archived in CV_Enhancements/pipeline/run_pipeline_with_cv.py for the day
+    you switch off pure-Gemini and back to CV grounding.
+    """
 
     console.print(Panel.fit(
         "[bold cyan]🏏 Cricket Intelligence Engine[/bold cyan]\n"
@@ -70,6 +100,10 @@ def run_full_pipeline(
         gemini = GeminiExtractor(model_name=gemini_model)
         records = gemini.extract_from_video(video_path, match_id=match_id)
 
+        if batsman_name and records:
+            for r in records:
+                r.batsman_name = batsman_name
+
         if not records:
             console.print("[red]✗ No deliveries detected. Exiting.[/red]")
             return
@@ -89,15 +123,113 @@ def run_full_pipeline(
         gemini.export_to_json(validated_records, output_json)
 
         stats = db.get_stats(match_id)
+        batsman_line = f"\nBatsman label: {batsman_name}" if batsman_name else ""
+        weakness_cmd = (
+            f"  3. Weakness: python features/batsman_analysis/analyse_batsman_weakness.py --batsman \"{batsman_name}\" --min-confidence 0.0"
+            if batsman_name else
+            "  3. Weakness: python features/batsman_analysis/analyse_batsman_weakness.py --batsman <name>"
+        )
         console.print(Panel.fit(
             f"[bold green]✅ Batch Pipeline Complete![/bold green]\n\n"
-            f"Match: {match_id} ({team_a} vs {team_b})\n"
+            f"Match: {match_id} ({team_a} vs {team_b}){batsman_line}\n"
             f"Balls detected by Gemini: {stats['total']}\n"
             f"Avg confidence: {stats['avg_confidence']:.1%}\n"
             f"JSON export: {output_json}\n\n"
             f"[cyan]Next steps:[/cyan]\n"
             f"  1. Review: streamlit run ui/app.py\n"
-            f"  2. API: python -m src.api.main",
+            f"  2. API: python -m src.api.main\n"
+            f"{weakness_cmd}",
+            border_style="green",
+        ))
+        return
+
+    # ===== Chunk Mode: FFmpeg chunks → batch Gemini analysis per chunk =====
+    if chunk_mode:
+        console.print("\n[bold cyan]Chunk Mode: FFmpeg → Gemini Batch Analysis per Chunk[/bold cyan]")
+        console.print(
+            f"  [dim]Cuts video into {chunk_duration:.0f}s chunks, sends each to Gemini "
+            f"(BATCH_EXTRACTION_PROMPT — same as batch mode but chunk by chunk)[/dim]"
+        )
+
+        import tempfile
+        from src.intelligence.extractor import GeminiExtractor
+
+        gemini = GeminiExtractor(model_name=gemini_model)
+        all_records = []
+        total_balls_so_far = 0
+
+        try:
+            total_sec = _video_duration(video_path)
+        except Exception as e:
+            console.print(f"[red]✗ ffprobe failed: {e}[/red]")
+            return
+
+        n_chunks = int(total_sec / chunk_duration) + (1 if total_sec % chunk_duration else 0)
+        console.print(f"  Video: {total_sec:.0f}s → {n_chunks} × {chunk_duration:.0f}s chunks\n")
+
+        with tempfile.TemporaryDirectory(prefix="cricket_chunks_") as tmpdir:
+            for i in range(n_chunks):
+                chunk_start = i * chunk_duration
+                chunk_path = str(Path(tmpdir) / f"chunk_{i:04d}.mp4")
+
+                ok = _cut_chunk(video_path, chunk_start, chunk_duration, chunk_path)
+                if not ok or not Path(chunk_path).exists():
+                    console.print(f"  [yellow]⚠ Chunk {i}: ffmpeg cut failed, skipping[/yellow]")
+                    continue
+
+                console.print(f"  [bold]Chunk {i+1}/{n_chunks}[/bold] (+{chunk_start:.0f}s)")
+                chunk_records = gemini.extract_from_video(
+                    chunk_path,
+                    match_id=match_id,
+                    innings=1,
+                    chunk_offset=chunk_start,
+                    ball_index_offset=total_balls_so_far,
+                )
+                all_records.extend(chunk_records)
+                total_balls_so_far += len(chunk_records)
+
+        if not all_records:
+            console.print("[red]✗ No deliveries detected across all chunks.[/red]")
+            return
+
+        if batsman_name:
+            for r in all_records:
+                r.batsman_name = batsman_name
+
+        console.print(f"\n[green]✓ {len(all_records)} ball records from {n_chunks} chunks[/green]")
+
+        console.print(f"\n[bold]Step 4: Validation & Normalization[/bold]")
+        from src.validation.normalizer import BallRecordValidator
+        validator = BallRecordValidator()
+        validated_records, _ = validator.validate_batch(all_records)
+
+        console.print(f"\n[bold]Step 5: Database Storage[/bold]")
+        from src.storage.db import CricketDB
+        db = CricketDB()
+        db.create_match({"match_id": match_id, "format": format_type, "team_a": team_a, "team_b": team_b})
+        db.save_balls_batch(validated_records)
+
+        output_json = f"data/{match_id}_extracted.json"
+        gemini.export_to_json(validated_records, output_json)
+
+        stats = db.get_stats(match_id)
+        batsman_line = f"\nBatsman label: {batsman_name}" if batsman_name else ""
+        weakness_cmd = (
+            f"  3. Weakness: python features/batsman_analysis/analyse_batsman_weakness.py --batsman \"{batsman_name}\" --min-confidence 0.0"
+            if batsman_name else
+            "  3. Weakness: python features/batsman_analysis/analyse_batsman_weakness.py --batsman <name>"
+        )
+        console.print(Panel.fit(
+            f"[bold green]✅ Chunk Mode Pipeline Complete![/bold green]\n\n"
+            f"Match: {match_id} ({team_a} vs {team_b}){batsman_line}\n"
+            f"Chunks processed: {n_chunks}\n"
+            f"Balls detected: {stats['total']}\n"
+            f"Avg confidence: {stats['avg_confidence']:.1%}\n"
+            f"JSON export: {output_json}\n\n"
+            f"[cyan]Next steps:[/cyan]\n"
+            f"  1. Review: streamlit run ui/app.py\n"
+            f"  2. API: python -m src.api.main\n"
+            f"{weakness_cmd}",
             border_style="green",
         ))
         return
@@ -132,85 +264,18 @@ def run_full_pipeline(
         console.print("[yellow]Skipping Gemini extraction (--skip-extraction)[/yellow]")
         return
 
-    # ===== Step 2.5: CV Frame Analysis (Roboflow) =====
-    # Sample a key frame from each clip and run DualModelDetector.
-    # This gives us geometric line/length from stumps + scene context.
-    # Passed into Gemini as grounding — dramatically improves line/length accuracy.
-    cv_contexts: dict[str, dict | None] = {}   # clip_path → cv_context dict
-
-    if use_cv_detection:
-        console.print("\n[bold]Step 2.5: CV Frame Analysis (Roboflow)[/bold]")
-        try:
-            import cv2 as _cv2
-            from src.detection.detect import DualModelDetector
-            dual_detector = DualModelDetector()
-
-            for clip_path in clip_paths:
-                try:
-                    cap = _cv2.VideoCapture(clip_path)
-                    total_frames = int(cap.get(_cv2.CAP_PROP_FRAME_COUNT))
-                    # Sample at cv_frame_offset into the clip (default 40%)
-                    # This typically captures the ball in flight / at pitch
-                    sample_frame_idx = max(0, int(total_frames * cv_frame_offset))
-                    cap.set(_cv2.CAP_PROP_POS_FRAMES, sample_frame_idx)
-                    ret, frame = cap.read()
-                    cap.release()
-
-                    if ret and frame is not None:
-                        cv_result = dual_detector.analyze_frame(frame)
-                        cv_contexts[clip_path] = cv_result
-                        geo = cv_result.get("geometry")
-                        if geo:
-                            console.print(
-                                f"  [green]✓[/green] {Path(clip_path).name}: "
-                                f"line=[cyan]{geo['line']}[/cyan] "
-                                f"length=[cyan]{geo['length']}[/cyan]"
-                            )
-                        else:
-                            console.print(
-                                f"  [yellow]⚠[/yellow] {Path(clip_path).name}: "
-                                "stumps/ball not detected — Gemini will estimate geometry"
-                            )
-                            cv_contexts[clip_path] = None
-                    else:
-                        cv_contexts[clip_path] = None
-
-                except Exception as e:
-                    console.print(f"  [yellow]⚠[/yellow] CV failed for {clip_path}: {e}")
-                    cv_contexts[clip_path] = None
-
-            detected = sum(1 for v in cv_contexts.values() if v and v.get("geometry"))
-            console.print(
-                f"[green]✓ CV geometry computed for {detected}/{len(clip_paths)} clips[/green]"
-            )
-
-        except ImportError as e:
-            console.print(f"[yellow]⚠ CV detection skipped — missing dependency: {e}[/yellow]")
-            console.print("  Install with: pip install inference-sdk opencv-python")
-            use_cv_detection = False
-        except ValueError as e:
-            console.print(f"[yellow]⚠ CV detection skipped: {e}[/yellow]")
-            console.print("  Set ROBOFLOW_API_KEY in .env to enable pre-analysis")
-            use_cv_detection = False
-    else:
-        console.print("\n[dim]Step 2.5: CV detection disabled (--no-cv)[/dim]")
-
     # ===== Step 3: Gemini Intelligence Extraction =====
     console.print("\n[bold]Step 3: Gemini Intelligence Extraction[/bold]")
-    if use_cv_detection:
-        console.print("  [cyan]Mode: CV-augmented (Roboflow geometry → Gemini)[/cyan]")
-    else:
-        console.print("  [dim]Mode: Gemini-only (no CV pre-analysis)[/dim]")
 
     from src.intelligence.extractor import GeminiExtractor
     gemini = GeminiExtractor(model_name=gemini_model)
 
     clips_dir = f"data/ball_clips/{match_id}"
-    records = gemini.extract_batch(
-        clips_dir,
-        match_id=match_id,
-        cv_contexts=cv_contexts if use_cv_detection else {},
-    )
+    records = gemini.extract_batch(clips_dir, match_id=match_id)
+
+    if batsman_name and records:
+        for r in records:
+            r.batsman_name = batsman_name
 
     # ===== Step 4: Validation =====
     console.print("\n[bold]Step 4: Validation & Normalization[/bold]")
@@ -271,12 +336,14 @@ if __name__ == "__main__":
     parser.add_argument("--max-clips", type=int, default=30)
     parser.add_argument("--model", type=str, default="gemini-2.5-flash")
     parser.add_argument("--skip-extraction", action="store_true")
-    parser.add_argument("--no-cv", action="store_true",
-                        help="Disable Roboflow CV pre-analysis (Gemini-only mode)")
-    parser.add_argument("--cv-frame-offset", type=float, default=0.4,
-                        help="Fraction into each clip to sample for CV (default: 0.4)")
     parser.add_argument("--batch-mode", action="store_true",
                         help="Send full video to Gemini — Gemini auto-detects all ball deliveries (no segmentation)")
+    parser.add_argument("--batsman-name", type=str, default=None,
+                        help="Override batsman name for all extracted balls (e.g. 'kohli-net-practice')")
+    parser.add_argument("--chunk-mode", action="store_true",
+                        help="Segment broadcast video via Gemini (90s chunks → live-play timestamps → per-clip extraction)")
+    parser.add_argument("--chunk-duration", type=float, default=90.0,
+                        help="Chunk length in seconds sent to Gemini for segmentation (default: 90)")
     args = parser.parse_args()
 
     run_full_pipeline(
@@ -292,7 +359,8 @@ if __name__ == "__main__":
         max_clips=args.max_clips,
         gemini_model=args.model,
         skip_extraction=args.skip_extraction,
-        use_cv_detection=not args.no_cv,
-        cv_frame_offset=args.cv_frame_offset,
         batch_mode=args.batch_mode,
+        batsman_name=args.batsman_name,
+        chunk_mode=args.chunk_mode,
+        chunk_duration=args.chunk_duration,
     )

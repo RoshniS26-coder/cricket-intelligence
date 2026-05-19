@@ -121,7 +121,7 @@ def _extract_gemini(clip: str) -> dict:
         console.print("[yellow]⚠ GEMINI_API_KEY missing — skipping Gemini extraction[/yellow]")
         return defaults
     try:
-        from src.intelligence.extractor import GeminiExtractor
+        from match_intelligence.lib.extractor import GeminiExtractor
         ex = GeminiExtractor()
         rec = ex.extract_from_clip(clip, match_id="render_demo", over=0, ball_number=1)
         if not rec:

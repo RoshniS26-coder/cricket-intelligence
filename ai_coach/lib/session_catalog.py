@@ -57,7 +57,7 @@ def run_session_catalog(
       2. Very low rate: <1 ball per 30 seconds → likely summarized
     """
     try:
-        from src.intelligence.extractor import GeminiExtractor
+        from match_intelligence.lib.extractor import GeminiExtractor
     except Exception as e:
         console.print(f"[yellow]⚠ catalog import failed: {e}[/yellow]")
         return None

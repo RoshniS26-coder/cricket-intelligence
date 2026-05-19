@@ -47,9 +47,9 @@ cp .env.example .env
 $EDITOR .env
 
 # Run DB migrations (idempotent)
-python features/db_migrations/migrate_add_pose.py
-python features/db_migrations/migrate_delivery_subtype.py
-python features/db_migrations/migrate_analytics_fields.py
+python scripts/db_migrations/migrate_add_pose.py
+python scripts/db_migrations/migrate_delivery_subtype.py
+python scripts/db_migrations/migrate_analytics_fields.py
 ```
 
 ## Add a new match (the 10-step recipe)
@@ -62,7 +62,7 @@ LABEL=<readable_label>           # e.g. IndvsEng_2024_T20I_1
 # Drop under data/cricsheet/<match_dir>/
 
 # 2. Export one innings (repeat for innings 2)
-python features/ball_extraction/export_cricsheet_innings.py \
+python match_intelligence/pipeline/export_cricsheet_innings.py \
     --cricsheet-id $MATCH_ID --innings <BattingTeam> \
     --out data/cricsheet/<dir>/<team>_innings.json
 
@@ -71,7 +71,7 @@ python features/ball_extraction/export_cricsheet_innings.py \
 # BOTTOM so all 20 overs render → Cmd+P → Save as PDF → data/espncricinfo/
 
 # 4. Parse the PDF
-python features/audio_pipeline/parse_espn_pdf.py \
+python match_intelligence/pipeline/parse_espn_pdf.py \
     --pdf "data/espncricinfo/<file>.pdf" \
     --out data/espncricinfo/<dir>/match_${MATCH_ID}_innings<n>_commentary.json \
     --match-id $MATCH_ID
@@ -81,7 +81,7 @@ python features/audio_pipeline/parse_espn_pdf.py \
 # See archive/chunk_mode_pipeline/ for the legacy video path.
 
 # 6. Synthesize the per-ball JSON (~$0.50, ~17 min)
-python features/ball_extraction/synthesize_match_json.py \
+python match_intelligence/pipeline/synthesize_match_json.py \
     --cricsheet-json data/cricsheet/<dir>/<team>_innings.json \
     --espn-commentary data/espncricinfo/<dir>/match_${MATCH_ID}_innings<n>_commentary.json \
     --gemini-video-glob 'data/NONEXISTENT_chunk*.json' \
@@ -95,16 +95,16 @@ python scripts/load_synth_to_db.py \
     --match-id $MATCH_ID --team-a <A> --team-b <B> --format T20
 
 # 8. Generate per-bowler + per-batter reports
-python features/bowler_analysis/bowler_report.py \
+python match_intelligence/reports/bowler_report.py \
     --match-id $MATCH_ID --innings <n> \
     --out data/bowler_analysis/match_${MATCH_ID}_innings_<n>.json
 
-python features/batsman_analysis/batsman_report.py \
+python match_intelligence/reports/batsman_report.py \
     --match-id $MATCH_ID --innings <n> \
     --out data/batsman_analysis/match_${MATCH_ID}_innings_<n>.json
 
 # 9. Generate heatmaps + wagon wheels
-python features/heatmap/generate_heatmaps.py \
+python match_intelligence/reports/generate_heatmaps.py \
     --match-id $MATCH_ID --innings <n> \
     --out-dir data/heatmaps/match_${MATCH_ID}_innings_<n>
 
@@ -118,28 +118,35 @@ streamlit run ui/app.py
 cricket-intelligence/
 ├── README.md                  ← this file
 ├── CLAUDE.md                  ← context for Claude Code sessions
-├── run_pipeline.py            ← (legacy chunk-mode orchestrator; not active)
 │
-├── src/                       ← reusable libraries
-│   ├── intelligence/          ← Cricsheet + ESPN + Gemini synthesis prompt + schemas
-│   ├── analytics/             ← heatmap + wagon wheel + weakness renderers
-│   └── storage/               ← SQLAlchemy DB layer
+├── src/                       ← SHARED infrastructure (used by both products)
+│   ├── intelligence/schema.py    ← Pydantic + Gemini schemas
+│   ├── analytics/                ← heatmap + wagon wheel + weakness renderers
+│   ├── storage/db.py             ← SQLAlchemy DB layer
+│   └── validation/, api/         ← shared validators + REST API
 │
-├── features/                  ← CLI scripts grouped by capability
-│   ├── ball_extraction/       ← the active pipeline (synthesize_match_json.py)
-│   ├── audio_pipeline/        ← ESPN PDF parser
-│   ├── bowler_analysis/       ← per-bowler reports
-│   ├── batsman_analysis/      ← per-batter reports
-│   ├── heatmap/               ← pitch maps + wagon wheels
-│   └── db_migrations/         ← idempotent SQLite migrations
+├── match_intelligence/        ← PRODUCT 1: T20/ODI broadcast analytics
+│   ├── lib/                      ← cricsheet, espn_commentary, synthesis_prompt, extractor
+│   ├── pipeline/                 ← synthesize_match_json.py (the active pipeline)
+│   └── reports/                  ← batsman_report, bowler_report, generate_heatmaps
 │
-├── scripts/                   ← one-off ops (load_synth_to_db.py)
-├── ui/app.py                  ← Streamlit UI
+├── ai_coach/                  ← PRODUCT 2: Student critique + briefing + pose
+│   ├── lib/                      ← coaching, critique, few-shot, briefing libs
+│   ├── briefing/                 ← AI Coach PDF briefing CLI
+│   ├── pipeline/                 ← critiques + coaching_corpus pipelines
+│   ├── pose/                     ← pose render CLI
+│   ├── rendering/                ← side-by-side video compare
+│   └── report/                   ← PDF / TTS / video mux
+│
+├── scripts/                   ← shared ops (load_synth_to_db, db_migrations)
+├── ui/app.py                  ← Streamlit UI (serves both products)
 ├── data/                      ← match data + DB (large files .gitignored)
 ├── docs/                      ← architecture, schema, heatmaps explainer
 ├── tests/                     ← pytest
-└── archive/                   ← retired pipelines kept for reference
+└── archive/                   ← retired pipelines (chunk_mode_pipeline)
 ```
+
+**Separation contract:** `match_intelligence/` never imports from `ai_coach/`. Both freely use `src/`. Coach may optionally import from Match (currently doesn't).
 
 For deeper docs:
 - [`docs/architecture.md`](docs/architecture.md) — system design, data flow, moat analysis

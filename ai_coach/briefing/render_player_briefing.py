@@ -156,7 +156,7 @@ def parse_reference(entry: str) -> dict:
 
 def run_gemini_extraction(clip_path: str, model: str = "gemini-2.5-flash") -> dict | None:
     try:
-        from src.intelligence.extractor import GeminiExtractor
+        from match_intelligence.lib.extractor import GeminiExtractor
     except Exception as e:
         console.print(f"[yellow]⚠ Gemini extractor import failed: {e}[/yellow]")
         return None
