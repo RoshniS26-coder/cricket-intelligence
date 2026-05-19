@@ -1,397 +1,345 @@
-# 🏏 Cricket Intelligence Engine — Architecture & Roadmap
+# 🏏 Cricket Intelligence Engine — Architecture
 
-> **Mindset:** Modularity · Iteration · Data-first  
-> Goal: *"Build a continuously improving dataset of ball-level intelligence from video."*
+> **Mindset:** Modularity · Longitudinal data · Coach-in-the-loop
+> Product goal: *"An AI Analyst in a box for Indian cricket academies — upload match/net video, get per-player technique briefings, weakness reports, and narrated overlay videos."*
 
 ---
 
 ## Table of Contents
 
-1. [What's Built — Phase 1 Status](#phase-1-status)
-2. [Every File Explained](#every-file-explained)
-3. [Data Flow End-to-End](#data-flow)
-4. [Phase 2 — Player & Pitch Insights](#phase-2)
-5. [Phase 3 — Strategy & AI Coach](#phase-3)
-6. [Continuous Learning Loop](#continuous-learning-loop)
-7. [Success Metrics](#success-metrics)
+1. [Product Direction](#product-direction)
+2. [System Layers](#system-layers)
+3. [Phase 1 Status — What's Built](#phase-1-status)
+4. [Directory Structure](#directory-structure)
+5. [Data Flow End-to-End](#data-flow)
+6. [Role Model (Batsman → Bowler → Keeper)](#role-model)
+7. [Camera Setup Tiers](#camera-setup)
+8. [Continuous Learning Flywheel](#flywheel)
+9. [Success Metrics](#success-metrics)
+10. [Non-Goals](#non-goals)
 
 ---
 
-## Phase 1 Status — What's Built ✅ {#phase-1-status}
+## 1. Product Direction {#product-direction}
 
-| Module | Status | Notes |
+The engine is being positioned as an **AI Analyst for premium Indian cricket academies** — not a broadcast tool, not a D2C consumer app.
+
+| Decision | Rationale |
+|---|---|
+| **Buyer = private academy head coach / owner** | ₹25k–₹1L/year tooling budgets exist; fast 1–3 month sales cycle; single decision-maker. |
+| **Not pro/franchise tier** | Hawk-Eye + CricViz + Dartfish already own it; hardware-gated, multi-year cycles. |
+| **Not D2C** | Fulltrack AI owns that segment with 2M users and peer-reviewed validation. |
+| **Moat = narrative + longitudinal + pose** | Competitors ship heatmaps; nobody ships LLM-written weakness briefings, pose-based technique trends over weeks, or coach-corrected India-specific datasets. |
+| **Start with batsman** | Higher ball volume per session, parents demand it, side-on camera is the industry-standard angle. Bowler + keeper extend the same pose pipeline later. |
+
+**One-line positioning:** replace a ₹8L/yr Dartfish + junior-analyst combination with a ₹50k/yr SaaS that ships overnight player briefings and shareable narrated clip reels.
+
+---
+
+## 2. System Layers {#system-layers}
+
+The engine is a **six-layer stack**. Layers 1, 4 (weakness), 5, and 6 are built; layers 2–3 are the current roadmap.
+
+```
+Layer 6:  Delivery        — PDF report · narrated overlay video · WhatsApp share · dashboard  ✅
+Layer 5:  Narrative       — LLM-generated weakness briefings + coaching cues                  ✅
+Layer 4:  Analytics       — weakness cross-tabs, pitch map, danger zone scoring               ✅
+Layer 3:  Technique       — MediaPipe pose → role-specific feature engineering
+Layer 2:  Identity        — scoreboard OCR + roster + manual tag, linked to batsman_name/bowler_name
+Layer 1:  Extraction      — Gemini + Roboflow CV → per-ball structured JSON                   ✅
+```
+
+### Batsman Weakness Analysis (Layer 4 + 5)
+
+Queries `line`, `length`, `outcome`, `contact_quality` per ball from the DB and computes a **danger zone matrix**:
+
+```
+danger_score = (dismissal_rate × 0.6) + (false_shot_rate × 0.4)
+```
+
+Four-layer stack:
+
+| Layer | File | What it does |
 |---|---|---|
-| Video ingestion (YouTube + local) | ✅ Done | `src/ingestion/downloader.py` |
-| Ball segmentation — uniform split | ✅ Done | `src/segmentation/clip_extractor.py` |
-| Ball segmentation — timestamp-based | ✅ Done | Same file, separate method |
-| **Batch mode** — Gemini auto-detects balls | ✅ Done | `run_pipeline.py --batch-mode` |
-| Gemini vision extraction | ✅ Done | `src/intelligence/extractor.py` |
-| Structured JSON schema | ✅ Done | `src/intelligence/schema.py` |
-| Validation + normalization | ✅ Done | `src/validation/normalizer.py` |
-| SQLite storage | ✅ Done | `src/storage/db.py` |
-| Human review UI (Streamlit) | ✅ Done | `ui/app.py` |
-| REST API | ✅ Done | `src/api/main.py` |
-| Ball trajectory tracking (YOLO) | ✅ Built, not active | `src/tracking/tracker.py` |
-| Roboflow CV — player/stump detection | ✅ Built, optional | `src/detection/detect.py` |
-| Custom YOLO training pipeline | ✅ Built, future use | `scripts/train_yolo.py` |
-| Cric-360 validation | ✅ Built, future use | `scripts/validate_cric360.py` |
+| Statistics | `src/analytics/weakness.py` | Line × length crosstab, danger scoring, bowler-type/variation breakdowns |
+| LLM Narrative | `src/intelligence/weakness_narrator.py` | Gemini → bilingual {en, hi} summary, bowling plan, batting advice |
+| Pitch Map | `src/analytics/pitch_map.py` | matplotlib bird's-eye danger heatmap PNG (no YOLO needed) |
+| CLI | `scripts/analyse_batsman_weakness.py` | `--batsman`, `--narrative`, `--pitch-map`, `--output` |
 
-**Phase 1 is complete.** You can run the full pipeline today with `--batch-mode` for best results.
+API: `GET /analytics/weakness?batsman_name=Rohit+Sharma&narrative=true`
 
----
+Streamlit: "Weakness Analysis" tab — zone grid, breakdown tabs, on-demand Gemini narrative.
 
-## Every File Explained {#every-file-explained}
-
-### `run_pipeline.py` — Main Orchestrator
-**Purpose:** The single entry point that runs the full pipeline end-to-end.  
-**Modes:**
-- `--batch-mode` → upload full video to Gemini, auto-detect all deliveries (recommended)
-- `--uniform` → split video into fixed-length clips, Gemini analyses each clip
-- `--timestamps` → split video using manually provided delivery timestamps
-
-**Key flags:** `--no-cv` (skip Roboflow), `--batch-mode`, `--segment-duration`, `--max-clips`
-
----
-
-### `src/ingestion/downloader.py` — Video Ingestion
-**Purpose:** Download YouTube videos or register local video files.  
-**Uses:** `yt-dlp` for YouTube, saves metadata JSON alongside the video.  
-**Output:** `data/raw_videos/<match-id>.mp4` + `<match-id>_meta.json`
-
-```bash
-python -m src.ingestion.downloader --url "https://youtube.com/..." --match-id my-match
-```
-
----
-
-### `src/segmentation/clip_extractor.py` — Ball Clip Cutter
-**Purpose:** Split a full match video into individual delivery clips using `ffmpeg`.  
-**Two modes:**
-1. `extract_uniform_segments()` — cuts every N seconds blindly (fast, imprecise)
-2. `extract_from_timestamps()` — cuts using exact start/end times per ball (precise, needs manual JSON)
-
-**Output:** `data/ball_clips/<match-id>/<match-id>_inn1_ov1_b1.mp4` per delivery  
-**Future:** Will be replaced/augmented by YOLO-based automatic timestamp detection
-
----
-
-### `src/intelligence/schema.py` — Ball Record Data Model
-**Purpose:** Defines the complete schema for one ball delivery. Single source of truth.  
-**Contains:**
-- `BallRecord` — Pydantic model with all ball fields
-- Enums: `Line`, `Length`, `ShotType`, `BowlerType`, `Outcome`, `Footwork`, etc.
-- `GEMINI_JSON_SCHEMA` — JSON schema passed to Gemini's `response_schema` to force structured output
-- `ConfidenceScores` — per-field confidence (0.0–1.0)
-
-**Every other module imports from here. Do not change field names without updating all modules.**
-
----
-
-### `src/intelligence/prompt.py` — Gemini Prompts
-**Purpose:** All prompts sent to Gemini. Kept separate so prompts can be improved without touching logic.  
-**Three prompts:**
-- `SYSTEM_PROMPT` — "You are an elite cricket analyst with 20+ years of experience..."
-- `EXTRACTION_PROMPT` — single ball clip analysis instructions
-- `BATCH_EXTRACTION_PROMPT` — full video, return array of deliveries (used by `--batch-mode`)
-- `CV_AUGMENTED_TEMPLATE` — when Roboflow geometry is available, injects pixel-precise line/length as grounding facts before asking Gemini for shot/bowler type etc.
-
-**This is the highest-leverage file for improving accuracy.** Better prompts = better results with zero code changes.
-
----
-
-### `src/intelligence/extractor.py` — Gemini Vision Extractor
-**Purpose:** Talks to the Gemini API, uploads videos, parses structured responses.  
-**Key methods:**
-- `extract_from_clip()` — analyse a single ball clip
-- `extract_batch()` — process a directory of clips one by one
-- `extract_from_video()` — **batch mode** — upload full video, Gemini returns array of balls
-
-**CV Override logic:** If Roboflow geometry is available AND confident (≥ 0.85), it overrides Gemini's line/length answer (Gemini can hallucinate; pixel math is deterministic).
-
----
-
-### `src/validation/normalizer.py` — Schema Validator
-**Purpose:** Clean up Gemini's output before saving to DB.  
-**Does:**
-1. **Fuzzy normalization** — `"just outside off"` → `outside_off`, `"back of a length"` → `short_of_length`
-2. **Cross-field consistency** — if shot = `leave`, force contact = `miss`; if outcome = `dot`, set `runs_scored = 0`
-3. **Confidence flagging** — mark records below 0.5 avg confidence as needing human review
-4. **Unknown count** — if 3+ fields are `unknown`, flag as poor extraction quality
-
----
-
-### `src/storage/db.py` — SQLite Database Layer
-**Purpose:** Store and query all ball records using SQLAlchemy ORM.  
-**Tables:**
-- `matches` — match metadata (teams, format, date)
-- `balls` — one row per delivery, all fields + confidence scores + review status
-
-**Key methods:** `save_ball()`, `get_balls_for_match()`, `get_balls_needing_review()`, `update_ball_review()`, `get_stats()`  
-**DB file:** `data/cricket_intelligence.db`
-
----
-
-### `src/api/main.py` — REST API (FastAPI)
-**Purpose:** HTTP API to query ball data from external systems or frontends.  
-**Endpoints:**
-| Method | Path | Action |
+| Layer | State | Owner modules |
 |---|---|---|
-| GET | `/balls?match_id=X` | List balls for a match |
-| GET | `/balls?needs_review=true` | Get low-confidence balls |
-| PUT | `/balls/{id}/review` | Submit human correction |
-| GET | `/analytics/summary` | Confidence stats, outcome distribution |
-| GET | `/clips/{ball_id}` | Serve the video clip file |
+| 1 Extraction | ✅ Built | `src/ingestion/`, `src/segmentation/`, `src/intelligence/`, `src/detection/`, `src/validation/`, `src/storage/` |
+| 2 Identity | ❌ To build | `src/identity/` (scoreboard OCR, roster, review-UI tagging) |
+| 3 Technique | ❌ To build | `src/pose/` (MediaPipe extractor + role-specific feature modules) |
+| 4 Analytics | ❌ To build | `src/analytics/profile.py`, `src/analytics/benchmarks.py` |
+| 5 Narrative | ❌ To build | `src/analytics/briefing.py` (Claude/Gemini prose, clip-linked) |
+| 6 Delivery | ❌ To build | `src/report/pdf.py`, `src/report/video_renderer.py`, `src/report/tts.py`, `src/report/mux.py` |
 
-```bash
-python -m src.api.main
-# Docs at http://localhost:8000/docs
+**Key insight:** Layer 1 is **role-agnostic**. `BallRecord` already captures both bowler-side (`bowler_type`, `line`, `length`, `variation`, `movement`) and batsman-side (`shot_type`, `footwork`, `contact_quality`) fields. The only role-specific work lives in Layers 3–5 (pose features, briefing prompts, overlay labels).
+
+---
+
+## 3. Phase 1 Status — What's Built ✅ {#phase-1-status}
+
+| Module | Status | File |
+|---|---|---|
+| Video ingestion (YouTube + local) | ✅ | `src/ingestion/downloader.py` |
+| Ball segmentation — uniform | ✅ | `src/segmentation/clip_extractor.py` |
+| Ball segmentation — timestamp-based | ✅ | Same file |
+| Batch mode — Gemini auto-detects all deliveries | ✅ | `run_pipeline.py --batch-mode` |
+| Gemini vision extraction (10+ fields + confidence) | ✅ | `src/intelligence/extractor.py` |
+| Pydantic schema (single source of truth) | ✅ | `src/intelligence/schema.py` |
+| Prompts (system, single, batch, CV-augmented) | ✅ | `src/intelligence/prompt.py` |
+| Roboflow CV (DualModelDetector + geometric line/length) | ✅ | `src/detection/detect.py` |
+| Ball trajectory (YOLO, 7–31% detection rate — weak) | ⚠ | `src/tracking/tracker.py` |
+| Validation + normalization | ✅ | `src/validation/normalizer.py` |
+| SQLite storage (matches + balls tables) | ✅ | `src/storage/db.py` |
+| REST API (FastAPI) | ✅ | `src/api/main.py` |
+| Review UI (Streamlit, 3 modes) | ✅ | `ui/app.py` |
+| Custom YOLO training pipeline | ✅ Built, unused | `scripts/train_yolo.py` |
+| Cric-360 validation | ✅ Built, unused | `scripts/validate_cric360.py` |
+
+**Current DB state:** 32 balls across 8 matches. POC phase — needs to scale to 500+ reviewed balls before analytics layer is statistically meaningful.
+
+---
+
+## 4. Directory Structure {#directory-structure}
+
+```
+cricket-intelligence/
+├── data/
+│   ├── raw_videos/          # Downloaded match + net video + metadata JSON
+│   ├── ball_clips/          # Per-ball clips (segmented mode)
+│   ├── pose/                # [NEW] Per-clip pose JSON (33 MediaPipe keypoints × N frames)
+│   ├── reports/             # [NEW] Generated PDFs, markdown briefings
+│   ├── reports/videos/      # [NEW] Annotated + narrated clip output
+│   ├── narration/           # [NEW] TTS .mp3 files for briefings
+│   ├── rosters/             # [NEW] Per-academy player lineups (YAML/JSON)
+│   └── cricket_intelligence.db  # SQLite (matches, balls, +pose_features, +ground_truth)
+├── models/                  # Custom weights (YOLO, pose classifiers)
+├── src/
+│   ├── ingestion/           ✅ YouTube + local registration
+│   ├── segmentation/        ✅ ffmpeg clip cutter
+│   ├── detection/           ✅ Roboflow + YOLO (scene + geometry)
+│   ├── tracking/            ⚠ Ball trajectory (park until perspective calibration)
+│   ├── intelligence/        ✅ Gemini extraction + prompts + schema
+│   ├── validation/          ✅ Schema normalization
+│   ├── storage/             ✅ SQLAlchemy + SQLite
+│   ├── api/                 ✅ FastAPI REST
+│   ├── identity/            [NEW] scoreboard_ocr.py · roster.py · tagger.py
+│   ├── pose/                [NEW] extractor.py · features/batsman.py · features/bowler.py · smoothing.py
+│   ├── analytics/           [NEW] profile.py · benchmarks.py · briefing.py
+│   └── report/              [NEW] pdf.py · video_renderer.py · tts.py · mux.py · subtitles.py
+├── ui/                      ✅ Streamlit review (extends with tagging + briefing preview)
+├── scripts/
+│   ├── train_yolo.py        ✅ Future use
+│   ├── validate_cric360.py  ✅ Future use
+│   ├── analyze_player.py    [NEW] end-to-end player-level entry point
+│   ├── render_player_video.py [NEW] annotated+narrated clip generator
+│   └── calibrate_pose_thresholds.py [NEW] threshold calibration on pro reference clips
+├── run_pipeline.py          ✅ Match-level orchestrator (extend with `--pose`, `--briefing` flags)
+├── requirements.txt
+├── ARCHITECTURE.md          This file
+├── PLAN.md                  6-week execution plan
+├── ENGINEERING.md           Module specs + interface contracts
+├── DIAGRAMS.md
+└── README.md
 ```
 
 ---
 
-### `ui/app.py` — Streamlit Review Dashboard
-**Purpose:** Human review interface. Watch the ball clip, see what Gemini extracted, correct wrong fields.  
-**Modes:**
-- **Dashboard** — total balls, reviewed count, avg confidence, outcome bar chart
-- **Review Balls** — per-ball review: video player + editable dropdowns for all fields
-- **Full Dataset** — table view of all balls with CSV export
-
-**This is where ground truth is built.** Every correction here feeds the continuous learning loop.
-
----
-
-### `src/detection/detect.py` — Roboflow CV + YOLO Detection *(Optional, Future)*
-**Purpose:** Computer vision layer for player/ball/stump detection.  
-**Status:** Built and functional. Not used in primary pipeline because Roboflow trial expires 28 Apr 2026 and video angles haven't shown stumps clearly in testing.  
-**Contains:**
-- `CricketDetector` — detects players and ball using Roboflow `cricket-oftm6/3` (mAP 96.2%)
-- `DualModelDetector` — runs both `cricket-oftm6/3` (scene) and `stumps/10` (geometry) together
-- `LineLengthEstimator` — converts stumps pixel position + ball pixel position into geometric line/length with stumps-width as unit of measurement
-
-**When this becomes useful:** Broadcast-quality, side-on camera footage where stumps are clearly visible. At that point, geometry-based line/length will be significantly more accurate than Gemini's estimation.
-
----
-
-### `src/tracking/tracker.py` — Ball Trajectory Tracker *(Future)*
-**Purpose:** Track the ball across every frame of a video to build a pixel-level trajectory.  
-**Uses:** YOLO (`yolov8n.pt` by default, custom model when available)  
-**Output:** Per-frame JSON `{frame, time_sec, x, y, confidence}` + optional 2D pitch map PNG  
-**Future value:**
-- Exact pitch landing point
-- Ball speed (distance/time between frames)
-- Pre/post-bounce deviation angle (seam/swing measurement)
-- Automatic delivery timestamp detection (when ball leaves bowler's hand → when it passes the batsman)
-
-```bash
-python -m src.tracking.tracker --video clip.mp4 --output tracked.mp4 --pitch-map
-```
-
----
-
-### `scripts/train_yolo.py` — Custom YOLO Training *(Future)*
-**Purpose:** Fine-tune YOLOv8 on cricket-specific data to replace the generic `yolov8n.pt` base model.  
-**Pipeline:**
-1. Downloads Cric-360 dataset from HuggingFace (`sarimshahzad/Cric-360`)
-2. Fine-tunes YOLOv8 on cricket broadcast frames
-3. Saves best weights to `models/`
-4. Validates on held-out Cric-360 test split
-
-**When to run:** After annotating 500+ ball bounding boxes. The Cric-360 dataset provides scene frames; ball bounding box annotations still need to be added via Roboflow's annotation tool.
-
----
-
-### `scripts/validate_cric360.py` — Model Validation *(Future)*
-**Purpose:** Benchmark how well the current detection model performs on real broadcast footage.  
-**Downloads** 100 test frames from `sarimshahzad/Cric-360` (HuggingFace) and runs the Roboflow model, reporting detection rate per class and confidence distribution.
-
----
-
-### `data/roboflowinference.py` — Quick Roboflow Test Script
-**Purpose:** Standalone script to test a single image through the Roboflow model and print raw predictions. Used for debugging and verifying API connectivity.
-
----
-
-## Data Flow End-to-End {#data-flow}
+## 5. Data Flow End-to-End {#data-flow}
 
 ```
-YouTube URL or local .mp4
-        │
-        ▼
-src/ingestion/downloader.py
-  → data/raw_videos/<match-id>.mp4
-        │
-        ├── BATCH MODE (recommended)
-        │   └── src/intelligence/extractor.py::extract_from_video()
-        │       → upload full video to Gemini
-        │       → Gemini returns JSON array [ball_1, ball_2, ...]
-        │
-        └── SEGMENTED MODE
-            └── src/segmentation/clip_extractor.py
-                → data/ball_clips/<match-id>/*.mp4
-                    │
-                    ├── [optional] src/detection/detect.py::DualModelDetector
-                    │   → Roboflow geometry (line, length from pixels)
-                    │
-                    └── src/intelligence/extractor.py::extract_from_clip()
-                        → Gemini per clip
-        │
-        ▼
-src/intelligence/schema.py::BallRecord
-        │
-        ▼
-src/validation/normalizer.py
-  → fuzzy text normalization
-  → cross-field consistency
-  → confidence flagging
-        │
-        ▼
-src/storage/db.py → data/cricket_intelligence.db
-        │
-        ├── data/<match-id>_extracted.json
-        ├── ui/app.py  (Streamlit review UI)
-        └── src/api/main.py  (REST API)
+                 ┌──────────────────────────────────────────┐
+                 │  YouTube URL | local .mp4 | pilot upload │
+                 └────────────────┬─────────────────────────┘
+                                  ▼
+                       src/ingestion/downloader.py
+                 → data/raw_videos/<match-id>.mp4 + _meta.json
+                                  │
+                 ┌────────────────┴──────────────────────┐
+                 │                                       │
+         BATCH MODE                              SEGMENTED MODE
+  (upload whole video to Gemini)       (ffmpeg split → per-clip analysis)
+                 │                                       │
+                 │                                       ▼
+                 │                    src/segmentation/clip_extractor.py
+                 │                    → data/ball_clips/<match-id>/*.mp4
+                 │                                       │
+                 │                                       ▼
+                 │                       src/detection/detect.py
+                 │                       (optional — Roboflow CV geometry)
+                 │                                       │
+                 ▼                                       ▼
+        src/intelligence/extractor.py ──────────────────┘
+        → per-ball BallRecord (line, length, shot, outcome, + confidence)
+
+                                  │
+                                  ▼
+   ┌──────────────────────────────┼─────────────────────────────────┐
+   │                              │                                 │
+   ▼                              ▼                                 ▼
+[NEW] src/identity/       [NEW] src/pose/                 src/validation/
+ scoreboard_ocr +          extractor.py → 33 keypoints     (existing)
+ roster + tagger            per frame
+ → batsman_name            src/pose/features/batsman.py
+   bowler_name              → head_offset, stride,
+   (reliable)                 shoulder_angle, etc.
+   │                         │
+   └───────────┬──────────────┘
+               ▼
+     src/storage/db.py
+     (balls + pose_features + ground_truth tables)
+               │
+               ▼
+       [NEW] src/analytics/profile.py
+       → PlayerProfile (aggregated across matches)
+       → Weakness cross-tabs
+       → Peer benchmarking vs academy median
+               │
+               ▼
+       [NEW] src/analytics/briefing.py
+       (Claude/Gemini → 400-word narrative + clip timestamps)
+               │
+               ▼
+   ┌───────────┴──────────┬─────────────────────────┐
+   ▼                      ▼                         ▼
+[NEW] src/report/    [NEW] src/report/        ui/app.py + src/api/main.py
+ pdf.py              video_renderer.py +       (review + tagging + briefing preview)
+ → A4 one-pager      tts.py + mux.py
+                     → narrated MP4
+                       with pose overlay
 ```
+
+**Existing (Layer 1) arrows are unchanged.** New modules attach at specific joins and do not require schema breakage to the Pydantic `BallRecord`.
 
 ---
 
-## Phase 2 — Player & Pitch Insights {#phase-2}
+## 6. Role Model — Batsman → Bowler → Keeper {#role-model}
 
-**Objective:** Answer questions like:
-- *"What's Kohli's weakness against short-pitched pace outside off?"*
-- *"Which bowler has the best death over economy in the last 3 matches?"*
-- *"Where does this pitch assist reverse swing vs spin?"*
+| Element | Batsman (v1) | Bowler (v2) | Keeper (v3) |
+|---|---|---|---|
+| Gemini fields used | `shot_type`, `footwork`, `contact_quality`, `outcome` | `bowler_type`, `line`, `length`, `variation`, `movement`, `bounce_behavior` | derived from scene detection |
+| Pose features module | `pose/features/batsman.py` | `pose/features/bowler.py` | `pose/features/keeper.py` |
+| Key metrics | head offset, stride length, shoulder angle, balance, backlift direction | run-up rhythm, front-foot landing, hip–shoulder separation, arm angle at release, follow-through balance | squat depth, hand position, head stability, lateral foot speed |
+| Camera angle | side-on behind batsman (45°) | behind-bowler end OR side-on to run-up | behind stumps keeper-end |
+| Briefing prompt variant | batsman-focused cues | delivery + injury-prevention cues | glove-work + head stability |
 
-### What Phase 1 already provides for Phase 2
-
-Every ball record already has: `bowler_name`, `batsman_name`, `line`, `length`, `shot_type`, `outcome`, `movement`, `bounce_behavior`. Once you have 500+ reviewed balls, Phase 2 analytics are simple SQL/Pandas aggregations on top of the existing DB.
-
-### Files to build
-
-**`src/analytics/player_engine.py`**
-```python
-# Query patterns from DB
-def bowler_line_length_heatmap(bowler_name, match_ids) → dict
-def batsman_weakness_profile(batsman_name) → dict
-  # e.g. {"outside_off + short_of_length": {"balls": 42, "wickets": 8, "boundary_pct": 0.05}}
-def head_to_head(bowler, batsman) → dict
-```
-
-**`src/analytics/pitch_engine.py`**
-```python
-def pitch_behavior_by_zone(match_id) → dict
-  # split pitch into 6 zones, count bounce_behavior per zone
-def movement_frequency(match_id) → dict
-  # how much seam/swing/turn in this match
-```
-
-**`ui/analytics.py`** — Add a new Streamlit page:
-- Heatmap of ball landing zones per bowler
-- Batsman weakness radar chart
-- Head-to-head comparison table
-
-### Strategy
-1. Get 200+ reviewed balls from Phase 1 UI
-2. Build aggregation queries in `player_engine.py` — no new AI needed
-3. Add analytics page to Streamlit UI
-4. Expose via new API endpoints in `main.py`
+**v2 plan:** reuse `src/pose/extractor.py`, add `features/bowler.py` and a bowler briefing prompt. Gemini extraction is already role-agnostic — no Layer 1 changes needed.
 
 ---
 
-## Phase 3 — Strategy & AI Coach {#phase-3}
+## 7. Camera Setup Tiers {#camera-setup}
 
-**Objective:** Proactive recommendations:
-- *"For this batsman, pitch it up on off stump — he's averaging 12 in that zone"*
-- *"This pitch is taking turn from over 15 — bring spinner on now"*
+| Tier | Cameras | What works | Target customer |
+|---|---|---|---|
+| **A — MVP** | 1 phone, side-on at 45°, 3–5 m from crease, chest-height tripod | Batsman pose + ball metadata via Gemini | Every pilot academy |
+| **B — Recommended** | + 1 behind-bowler phone | Adds bowler pose + tighter line/length + pitch landing view | Phase-2 academies |
+| **C — Full kit** | + elevated 45° pitch-map camera | True pitch coordinates via homography | Future, state-assoc tier |
 
-### What's needed beyond Phase 2
+**Product ships a physical kit** (tripod + phone mount + SD card + placement guide) in Tier A. The kit doubles as an installation moat — switching cost increases as the recording setup becomes the academy's default.
 
-| Component | Approach |
-|---|---|
-| **Match context awareness** | Feed current match state (score, wickets, overs) into prompts |
-| **Historical pattern DB** | Phase 2 analytics DB + CricSheet ground truth linked by player name |
-| **Recommendation engine** | LLM (Gemini) queried with structured context: `"Batsman X, pitch Y, match situation Z → suggest bowling plan"` |
-| **Confidence calibration** | Compare Gemini's Phase 1 outputs to CricSheet ground truth → measure accuracy → weight recommendations |
-
-### Files to build
-
-**`src/intelligence/coach.py`**
-```python
-class AICoach:
-    def bowling_plan(self, batsman_name, pitch_behavior, match_situation) → str
-    def field_placement(self, batsman_weakness, bowler_type) → dict
-    def over_strategy(self, remaining_overs, required_rate, batsman_profile) → str
-```
-
-**`src/analytics/cricsheet_linker.py`**  
-Link ball records to CricSheet data by match + over + ball number → enables accuracy measurement by comparing extracted line/length to ground truth.
-
-### Strategy
-1. Complete Phase 2 (player profiles must exist before strategy is meaningful)
-2. Download CricSheet data for your test matches to create ground truth
-3. Build `AICoach` as a Gemini-backed reasoning layer with structured context injection
-4. Gate recommendations behind confidence thresholds — only suggest when pattern has ≥ 10 data points
+Camera requirements for pose (Tier A minimum):
+- 1080p, 30 fps minimum (60 fps preferred for impact-frame detection)
+- Batsman occupies ≥ 40% of vertical frame height
+- Landscape orientation, locked exposure
+- Stable (tripod or rigid phone mount)
 
 ---
 
-## Continuous Learning Loop {#continuous-learning-loop}
+## 8. Continuous Learning Flywheel {#flywheel}
 
 ```
-Gemini extracts ball data
-        │
-        ▼
-Confidence < 0.5 OR unknowns ≥ 3?
-        │
-       YES → flagged for human review in UI
-        │
-        ▼
-Human corrects in ui/app.py
-        │
-        ▼
-Corrected record saved (is_reviewed=True, reviewed_by="human")
-        │
-        ▼
-Ground truth dataset grows in SQLite
-        │
-        ├── Short-term: improves prompt engineering
-        │   (look at patterns in corrections → refine prompt.py)
-        │
-        └── Long-term: fine-tune custom model on corrections
-            (scripts/train_yolo.py for CV, or Gemini fine-tuning via API)
+Gemini extracts ball  ──▶  MediaPipe pose  ──▶  Feature module (batsman)
+                                                         │
+                                                         ▼
+                                       Per-ball record in SQLite
+                                                         │
+                                                         ▼
+                          Low confidence? Unknowns? Fault flag?
+                                                         │
+                                           YES ──▶ Review UI
+                                                         │
+                                                         ▼
+                                  Coach corrects field / confirms
+                                                         │
+                                                         ▼
+                            ground_truth table logs the delta:
+                            (ball_id, field, old_value, new_value,
+                             coach_id, timestamp, pose_features_at_time)
+                                                         │
+                    ┌────────────────────────────────────┴─────────────────────┐
+                    ▼                                                          ▼
+  Short-term: prompt tuning / threshold               Long-term: fine-tune a compact
+  recalibration based on correction patterns         India-cricket-tuned pose classifier
+                                                      on ≥ 50k labels → drops Gemini cost
+                                                      10× and builds a proprietary moat
 ```
 
-**Key insight:** Every human correction in the UI is a labeled training example. The `is_reviewed` flag and `review_notes` field in the schema exist precisely to track this.
+Every correction in `ui/app.py` writes a row to `ground_truth` (new table). That table is the company's proprietary dataset. CricHeroes has manual-scored data; they do not have pose-corrected data. This is the asset.
+
+**Design rules for the flywheel**:
+1. Every field the coach can change in the UI is logged with `(old, new, context, who, when)`.
+2. Corrections trigger a `retrain-candidate` flag on the ball — batched into weekly retraining runs later.
+3. Review UI must make corrections **one-tap** wherever possible. Friction = fewer labels = weaker moat.
 
 ---
 
-## Success Metrics {#success-metrics}
+## 9. Success Metrics {#success-metrics}
 
-### Phase 1 (Now)
+### Phase 0 — 5-coach validation (before writing Phase 1 code)
 | Metric | Target |
 |---|---|
-| % balls correctly classified (manual check) | > 75% |
-| Avg confidence across all fields | > 0.75 |
-| % "unknown" outputs | < 20% |
-| Processing time per ball (batch mode) | < 30 sec |
-| Balls in reviewed dataset | 200+ |
+| Coaches who say report told them something new | ≥ 3 of 5 |
+| Coaches who ask to share with a player/parent unprompted | ≥ 2 of 5 |
+| Coaches who name a fair price ≥ ₹25k/yr | ≥ 2 of 5 |
+| "Green" scorecards (≥ 4 of 5 signals hit) | ≥ 3 of 5 |
 
-### Phase 2
+### Phase 1 — Extraction (current)
 | Metric | Target |
 |---|---|
-| Bowler line/length accuracy vs CricSheet | > 80% |
-| Batsman weakness profiles built | > 10 players |
+| Gemini field accuracy (manual check) | > 75% |
+| Avg confidence across fields | > 0.75 |
+| Unknown rate | < 20% |
+| Processing time / ball (batch mode) | < 30 s |
+| Reviewed balls in DB | 500+ |
 
-### Phase 3
+### Phase 2 — Technique layer
 | Metric | Target |
 |---|---|
-| Coach recommendation acceptance rate (human eval) | > 60% |
-| Strategy suggestions backed by ≥ 10 data points | 100% |
+| MediaPipe detection rate (side-on Tier A video) | > 90% frames |
+| Pose feature computation rate per ball | > 80% balls |
+| Coach-agreed technique flag accuracy | > 70% |
+
+### Phase 3 — Pilot
+| Metric | Target |
+|---|---|
+| Pilot academies onboarded | 3 |
+| Weekly reports delivered per academy | ≥ 10 players |
+| Coaches opening report within 48h | > 70% |
+| Coaches sharing with players/parents | > 50% |
+| Paid conversions after 3-month pilot | ≥ 1 of 3 |
 
 ---
 
-## Non-Goals (Current Phase)
+## 10. Non-Goals {#non-goals}
 
-- Exact ball speed detection (requires calibrated camera or speed gun integration)
-- Real-time streaming analysis
-- Field placement reconstruction from video
-- Perfect ball tracking (YOLO tracker works but needs custom trained weights)
-- Captain decision engine (Phase 3+)
+Explicitly out of scope for the current roadmap:
+
+- Exact ball speed detection from single-camera phone video (physics + calibration problem Hawk-Eye solves with 6 synced stadium cameras)
+- Real-time / live streaming analysis (batch overnight is sufficient for the academy use case)
+- Field placement reconstruction from broadcast
+- Broadcast-quality 3D ball trajectory (current YOLO detection rate 7–31% — shelve until perspective calibration is built)
+- Match simulation / captain decision engine
+- BCCI / IPL franchise sales motion (different buyer, different product)
+- Fielder analysis (sparse events, multi-camera requirement — defer indefinitely)
+- D2C individual-player subscriptions (Fulltrack owns; distribution war we can't win)
+
+---
+
+**See also:** [PLAN.md](./PLAN.md) for the 6-week execution plan · [ENGINEERING.md](./ENGINEERING.md) for module specs + interface contracts · [DIAGRAMS.md](./DIAGRAMS.md) for sequence + data-flow diagrams.

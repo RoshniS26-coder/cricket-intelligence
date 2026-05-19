@@ -118,13 +118,12 @@ cricket-intelligence/
 │   └── raw_videos/                          ← downloaded broadcast videos
 │
 ├── docs/
-│   ├── architecture.md
-│   ├── engineering.md
-│   ├── features.md
-│   ├── schema.md
-│   ├── heatmaps_explained.md       ← UI heatmap vs new heatmap explainer
+│   ├── architecture.md             ← deep technical reference (current state)
+│   ├── schema.md                   ← DB schema + field provenance
+│   ├── heatmaps_explained.md       ← frequency vs danger heatmap explainer
+│   ├── project_context.md          ← DYNAMIC rolling log, updated via /update-context
 │   ├── tasks/                      ← per-task docs (document-first approach)
-│   └── project_context.md          ← DYNAMIC log, updated via /update-context
+│   └── archive/                    ← retired docs (engineering, features, dated snapshots)
 │
 ├── archive/                        ← superseded files kept for reference only
 │   ├── README.md                   ← what's in here and why
