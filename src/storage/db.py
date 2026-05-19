@@ -32,6 +32,9 @@ class MatchRecord(Base):
     team_b = Column(String, default="")
     venue = Column(String, nullable=True)
     date = Column(String, nullable=True)
+    # Tier-1 analytics enrichment
+    match_date = Column(String, nullable=True)        # ISO date if known
+    day_or_night = Column(String, nullable=True)      # day | night | day_night | unknown
     source_url = Column(String, nullable=True)
     video_path = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
@@ -58,6 +61,12 @@ class BallDBRecord(Base):
     bounce_behavior = Column(String, default="unknown")
     movement = Column(String, default="unknown")
 
+    # Delivery sub-type (finer granularity for weakness cross-tabs)
+    swing_direction = Column(String, default="unknown")
+    swing_type = Column(String, default="unknown")
+    spin_direction = Column(String, default="unknown")
+    ball_age_phase = Column(String, default="unknown")
+
     # Batting analysis
     shot_type = Column(String, default="unknown")
     footwork = Column(String, default="unknown")
@@ -66,6 +75,16 @@ class BallDBRecord(Base):
     # Result
     outcome = Column(String, default="unknown")
     runs_scored = Column(Integer, default=0)
+
+    # Tier-1 analytics enrichment
+    shot_direction = Column(String, default="unknown")
+    dismissal_type = Column(String, default="none")
+    dismissal_fielder = Column(String, nullable=True)
+    bowling_speed_kmph = Column(Float, nullable=True)
+    bowler_crease = Column(String, default="unknown")
+    edge_type = Column(String, default="none")
+    phase = Column(String, default="unknown")
+    batsman_handedness = Column(String, default="unknown")
 
     # Confidence scores
     confidence_bowler_type = Column(Float, default=0.0)
@@ -160,6 +179,19 @@ class CricketDB:
                 runs_scored=ball_record.runs_scored,
                 bounce_behavior=ball_record.bounce_behavior.value,
                 movement=ball_record.movement.value,
+                swing_direction=ball_record.swing_direction.value,
+                swing_type=ball_record.swing_type.value,
+                spin_direction=ball_record.spin_direction.value,
+                ball_age_phase=ball_record.ball_age_phase.value,
+                # Tier-1 analytics enrichment
+                shot_direction=ball_record.shot_direction.value,
+                dismissal_type=ball_record.dismissal_type.value,
+                dismissal_fielder=ball_record.dismissal_fielder,
+                bowling_speed_kmph=ball_record.bowling_speed_kmph,
+                bowler_crease=ball_record.bowler_crease.value,
+                edge_type=ball_record.edge_type.value,
+                phase=ball_record.phase.value,
+                batsman_handedness=ball_record.batsman_handedness.value,
                 confidence_bowler_type=ball_record.confidence.bowler_type,
                 confidence_line=ball_record.confidence.line,
                 confidence_length=ball_record.confidence.length,
@@ -243,6 +275,47 @@ class CricketDB:
             record.updated_at = datetime.now()
             session.commit()
             return True
+        finally:
+            session.close()
+
+    def get_balls_for_batsman(
+        self,
+        batsman_name: str,
+        match_id: str = None,
+        min_confidence: float = 0.5,
+    ) -> list[BallDBRecord]:
+        """Fetch all balls faced by a batsman with reliable line/length confidence.
+
+        Args:
+            batsman_name: Partial or full name match (case-insensitive).
+            match_id: Optional — restrict to one match.
+            min_confidence: Exclude balls where line or length confidence is below this.
+        """
+        session = self.get_session()
+        try:
+            query = session.query(BallDBRecord).filter(
+                BallDBRecord.batsman_name.ilike(f"%{batsman_name}%"),
+                BallDBRecord.confidence_line >= min_confidence,
+                BallDBRecord.confidence_length >= min_confidence,
+            )
+            if match_id:
+                query = query.filter_by(match_id=match_id)
+            return query.order_by(BallDBRecord.created_at).all()
+        finally:
+            session.close()
+
+    def list_batsmen(self, match_id: str = None) -> list[str]:
+        """Return distinct non-null batsman names stored in the DB."""
+        session = self.get_session()
+        try:
+            query = session.query(BallDBRecord.batsman_name).filter(
+                BallDBRecord.batsman_name.isnot(None),
+                BallDBRecord.batsman_name != "",
+            )
+            if match_id:
+                query = query.filter_by(match_id=match_id)
+            rows = query.distinct().all()
+            return sorted(r[0] for r in rows)
         finally:
             session.close()
 

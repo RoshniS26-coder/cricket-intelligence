@@ -1,0 +1,139 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Project metadata
+# ─────────────────────────────────────────────────────────────────────────────
+
+[project]
+name = "cricket-intelligence"
+version = "0.1.0"
+description = "Ball-by-ball cricket video understanding for academies, analysts, and coaches."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [
+    { name = "Cricket Intelligence Engine team" },
+]
+keywords = ["cricket", "video-analysis", "gemini", "computer-vision", "sports-analytics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Other Audience",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core runtime dependencies (mirrors requirements.txt). Loose pins to match
+# the project's current style; tighten when you cut a release.
+dependencies = [
+    # Core
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    # Video processing
+    "opencv-python>=4.9.0",
+    "ffmpeg-python>=0.2.0",
+    "yt-dlp>=2024.1.0",
+    # Dataset download
+    "datasets>=2.18.0",
+    "huggingface_hub>=0.21.0",
+    "matplotlib>=3.8.0",
+    # AI / LLM
+    "google-genai>=1.0.0",
+    # Data & validation
+    "pydantic>=2.5.0",
+    "pandas>=2.1.0",
+    "pyyaml>=6.0.0",
+    # Storage
+    "sqlalchemy>=2.0.0",
+    # API
+    "fastapi>=0.109.0",
+    "uvicorn>=0.27.0",
+    # Review UI
+    "streamlit>=1.31.0",
+    # Reporting
+    "reportlab>=4.1.0",
+    # Utilities
+    "rich>=13.7.0",
+    "tqdm>=4.66.0",
+    "numpy>=1.26.0",
+    "Pillow>=10.2.0",
+]
+
+[project.optional-dependencies]
+# Development tooling — `pip install -e ".[dev]"` for contributors.
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+# Pose pipeline — needs Python ≤3.12. `pip install ".[pose]"` in venv312.
+pose = [
+    "mediapipe>=0.10.11",
+    "edge-tts>=6.1.10",
+]
+# CV experiments archived under CV_Enhancements/ — only needed if you restore
+# the Roboflow / YOLO pipeline. Not installed by default.
+cv = [
+    "ultralytics>=8.0.0",
+    "supervision>=0.18.0",
+    "roboflow>=1.1.0",
+]
+
+[project.urls]
+Documentation = "./docs/architecture.md"
+Repository = "https://github.com/your-org/cricket-intelligence"
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Package discovery
+# ─────────────────────────────────────────────────────────────────────────────
+# The codebase uses `src/` as the importable package itself (not the
+# `src/<package_name>/` PyPA layout). Setuptools' find filter picks up every
+# subpackage under src/. Feature scripts under features/ are stand-alone CLIs
+# and intentionally NOT discovered.
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+exclude = ["tests*", "features*", "CV_Enhancements*", "docs*", "data*", "ui*"]
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  pytest
+# ─────────────────────────────────────────────────────────────────────────────
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-q",
+    "--tb=short",
+    "--strict-markers",
+]
+markers = [
+    "slow: marks tests as slow (deselect with -m 'not slow')",
+    "integration: tests that hit external services (Gemini, network) — skipped by default",
+]
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Coverage (when running `pytest --cov`)
+# ─────────────────────────────────────────────────────────────────────────────
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "src/api/main.py",            # FastAPI app entry point — covered by integration tests, not unit
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+]

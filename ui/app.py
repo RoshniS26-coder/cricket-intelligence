@@ -341,12 +341,12 @@ elif mode == "⚠️ Weakness Analysis":
     # Pitch map — rendered inline automatically
     if zones:
         st.subheader("Pitch Map")
-        from src.analytics.pitch_map import render_pitch_map
+        from src.analytics.heatmaps import render_danger_map
         import tempfile, os
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
             tmp_path = tmp.name
         try:
-            render_pitch_map(profile, output_path=tmp_path,
+            render_danger_map(profile, output_path=tmp_path,
                              title=selected_batsman)
             st.image(tmp_path, use_container_width=True,
                      caption="Bird's-eye danger heatmap — red = high danger, green = safe, grey = no data")

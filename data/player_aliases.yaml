@@ -1,0 +1,59 @@
+# Player name canonicalisation.
+#
+# The validator (src/validation/normalizer.py:resolve_player_name) reads this
+# file and replaces any short-form Gemini emits with the canonical full name,
+# so per-player analytics queries don't get split across "Iyer" and
+# "Shreyas Iyer".
+#
+# Match is case-insensitive and exact (whole-string). Curate by adding new
+# entries as you see Gemini producing variants.
+#
+# Format:
+#   <observed-form> : <canonical-form>
+
+aliases:
+  # India batsmen seen in T20-IndvsEng
+  "Iyer": "Shreyas Iyer"
+  "Rohit": "Rohit Sharma"
+  "Suryakumar": "Suryakumar Yadav"
+  "SKY": "Suryakumar Yadav"
+  "Pant": "Rishabh Pant"
+  "Kohli": "Virat Kohli"
+  "Hardik": "Hardik Pandya"
+  "Karthik": "Dinesh Karthik"
+  "DK": "Dinesh Karthik"
+  "Jadeja": "Ravindra Jadeja"
+  "Jaddu": "Ravindra Jadeja"
+  "Bhuvi": "Bhuvneshwar Kumar"
+  "Bumrah": "Jasprit Bumrah"
+  "Ashwin": "Ravichandran Ashwin"
+  "H. Patel": "Harshal Patel"
+
+  # England bowlers seen in T20-IndvsEng
+  "Willey": "David Willey"
+  "Topley": "Reece Topley"
+  "Jordan": "Chris Jordan"
+  "Gleeson": "Richard Gleeson"
+  "Livingstone": "Liam Livingstone"
+  "Moeen": "Moeen Ali"
+  "Rashid": "Adil Rashid"
+  "Stokes": "Ben Stokes"
+  "Buttler": "Jos Buttler"
+  "Bairstow": "Jonny Bairstow"
+
+  # New Zealand (srilanka-match data — actually NZ vs SL)
+  "Munro": "Colin Munro"
+  "Santner": "Mitchell Santner"
+  "Neesham": "Jimmy Neesham"
+  "Taylor": "Ross Taylor"
+  "Seifert": "Tim Seifert"
+  "Allen": "Finn Allen"
+  "de Grandhomme": "Colin de Grandhomme"
+  "Rutherford": "Hamish Rutherford"
+  "G.J. Gardner": "Glenn Gardner"
+
+  # India U19 / domestic (suryavanshi-ind-aus)
+  "V Sooryavanshi": "Vaibhav Suryavanshi"
+  "A Mhatre": "Ayush Mhatre"
+  "V Malhotra": "Vihaan Malhotra"
+  "V Trivedi": "Vaibhav Trivedi"

@@ -222,10 +222,10 @@ def main() -> int:
 
     # Pitch map
     if args.pitch_map:
-        from src.analytics.pitch_map import render_pitch_map
+        from src.analytics.heatmaps import render_danger_map
         slug = args.batsman.lower().replace(" ", "_")
         out_path = args.pitch_map_out or f"data/reports/{slug}_pitch_map.png"
-        saved = render_pitch_map(profile, output_path=out_path)
+        saved = render_danger_map(profile, output_path=out_path)
         console.print(f"\n[green]✓[/green] Pitch map saved → {saved}")
 
     # JSON output

@@ -1,0 +1,1095 @@
+{
+  "match_id": "1276906",
+  "source": "data/espncricinfo/Ball by Ball Commentary & Live Score - ENG vs IND, 3rd T20I.pdf",
+  "balls": [
+    {
+      "scoreboard_over": 0,
+      "scoreboard_ball": 1,
+      "bowler": "Willey",
+      "batter": "Rohit Sharma",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Full, angling across to off stump, pushed to the left of mid-off"
+    },
+    {
+      "scoreboard_over": 0,
+      "scoreboard_ball": 2,
+      "bowler": "Willey",
+      "batter": "Pant",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball straightening close to off stump. Presses forward and looks for the bunted single to the off side, but Willey moves quickly in his follow-through to cut it off"
+    },
+    {
+      "scoreboard_over": 0,
+      "scoreboard_ball": 3,
+      "bowler": "Willey",
+      "batter": "Pant",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball outside off, a hint of swing again, turns his wrists on top of the bounce to play it towards point. Almost a front-foot cut"
+    },
+    {
+      "scoreboard_over": 0,
+      "scoreboard_ball": 4,
+      "bowler": "Willey",
+      "batter": "Pant",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Swing away from the left-hander again. Good length and outside off stump. Pant's bat is drawn away from his body -which isn't a big deal in T20 cricket, but he was trying to defend this. Beaten"
+    },
+    {
+      "scoreboard_over": 0,
+      "scoreboard_ball": 5,
+      "bowler": "Willey",
+      "batter": "Pant",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball on off stump now, uses his wrists nicely to work this to deep square leg"
+    },
+    {
+      "scoreboard_over": 0,
+      "scoreboard_ball": 6,
+      "bowler": "Willey",
+      "batter": "Rohit Sharma",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 1,
+      "scoreboard_ball": 1,
+      "bowler": "Topley",
+      "batter": "Pant",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "And he strikes first ball. Is this lbw or caught-behind? A swipe across the line from Pant, and the ball ends up in the keeper's gloves. Went either off the edge or Pant's back leg. Pant consults for a long time with Rohit over whether to review, and in the end they overshoot their 15 seconds before he makes the T sign. Has to walk back, and is there a chance he could have reviewed and survived? We will see very soon. Went past the inside edge -or grazed it -and hit his back leg, and then bounced to the keeper. Ah, replays show there was a faint inside edge onto his back leg Rishabh Pant c \u2020Buttler b Topley 1 \ue0815b 0x4 0x6 7m) SR\ue092 20 Photos Left-arm pace from both ends. Here's Topley."
+    },
+    {
+      "scoreboard_over": 1,
+      "scoreboard_ball": 2,
+      "bowler": "Topley",
+      "batter": "Kohli",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Back of a length, slanting across, hops to ride the bounce and punches into the covers"
+    },
+    {
+      "scoreboard_over": 1,
+      "scoreboard_ball": 3,
+      "bowler": "Topley",
+      "batter": "Kohli",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball angling across to off stump, shuffles across and works it away to deep square leg"
+    },
+    {
+      "scoreboard_over": 1,
+      "scoreboard_ball": 4,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball on off stump, a hint of shape back in, defended to short extra-cover"
+    },
+    {
+      "scoreboard_over": 1,
+      "scoreboard_ball": 5,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Not quite short enough to pull, on top of off stump. Hits it hard into the ground and it goes to short midwicket"
+    },
+    {
+      "scoreboard_over": 1,
+      "scoreboard_ball": 6,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Inswing again from Topley, but it's probably headed down leg, so only the faintest of lbw appeals after Rohit misses the flick Looks like that mistimed pull did some damage to Rohit's bat. The ball hit the splice, and maybe dislodged the handle a little. He's changed it now."
+    },
+    {
+      "scoreboard_over": 2,
+      "scoreboard_ball": 1,
+      "bowler": "Willey",
+      "batter": "Kohli",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Steps out but gets too close to the pitch of this one -it's slanting across before swinging back in towards off"
+    },
+    {
+      "scoreboard_over": 2,
+      "scoreboard_ball": 2,
+      "bowler": "Willey",
+      "batter": "Kohli",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Shot. Shuffles out of his crease again, and this time it's the length ball from Willey, swinging back into the stumps. Gets close to the pitch of it and whips it wristily over wide mid-on. Didn't quite middle it, but he gets four"
+    },
+    {
+      "scoreboard_over": 2,
+      "scoreboard_ball": 3,
+      "bowler": "Willey",
+      "batter": "Kohli",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "6",
+      "commentary": "This is middled, no doubt about it. Sweet, sweet timing. Steps out again, steps away from leg stump to create room, and he can free his arms against the stump-to-stump ball and loft it cleanly back over the bowler's head Photos"
+    },
+    {
+      "scoreboard_over": 2,
+      "scoreboard_ball": 4,
+      "bowler": "Willey",
+      "batter": "Kohli",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Gone, he was looking so good! Steps out again, and looks to slap a wide length ball through the covers. The shot was on, because he had created enough room, but he hits it at catchable height, close to the fielder at short extra-cover, and Roy"
+    },
+    {
+      "scoreboard_over": 2,
+      "scoreboard_ball": 5,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball swinging into the pads, whipped away to deep square leg Suryakumar Yadav is in ahead of Shreyas Iyer. He only scored 11, but for a lot of viewers, this was a refreshing innings from Kohli. Is this how he'll bat in T20Is the era of Jammyball?"
+    },
+    {
+      "scoreboard_over": 2,
+      "scoreboard_ball": 6,
+      "bowler": "Willey",
+      "batter": "Rohit Sharma",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball close to off stump, punched to short extfa-cover"
+    },
+    {
+      "scoreboard_over": 3,
+      "scoreboard_ball": 1,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball angling into the stumps, punched with a more or less full face to midwicket Gleeson."
+    },
+    {
+      "scoreboard_over": 3,
+      "scoreboard_ball": 2,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 3,
+      "scoreboard_ball": 3,
+      "bowler": "Gleeson",
+      "batter": "Rohit Sharma",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Back of a length on off stump, opens his bat face and dabs into the cover point region"
+    },
+    {
+      "scoreboard_over": 3,
+      "scoreboard_ball": 4,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Fullish, angling in towards off stump, punched firmly to short extra-cover"
+    },
+    {
+      "scoreboard_over": 3,
+      "scoreboard_ball": 5,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Shortish in the corridor, and Gleeson gets this to kick up sharply. Suryakumar looks to dab it down to third man and is beaten comprehensively by the extra bounce"
+    },
+    {
+      "scoreboard_over": 3,
+      "scoreboard_ball": 6,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Lovely shot. Low full-toss, but it was angling into the base of the stumps, so he didn't have much room to work with. Gets his feet out of the way and opens his bat face to drive between backward point and cover point"
+    },
+    {
+      "scoreboard_over": 4,
+      "scoreboard_ball": 1,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Now it's Rohit's turn to step out of his crease. Makes a bit of room, and lofts the off-stump ball up and over the gap between extra-cover and mid-off Topley swaps ends."
+    },
+    {
+      "scoreboard_over": 4,
+      "scoreboard_ball": 2,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Steps out again and this time Topley follows him and fires it at his feet. Pushes to mid-off and sets off for a quick single. Jordan hits the bowler's-end stumps direct, but Rohit is home safely"
+    },
+    {
+      "scoreboard_over": 4,
+      "scoreboard_ball": 3,
+      "bowler": "Topley",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Back of a length, angling across to off stump. Shapes to work it leg side, gets squared up and edges towards backward point 4.3 1w TOPLEY TO SURYAKUMAR, 1 WIDE Appeal for a catch behind, and Alex Wharf signals wide, even though there seemed to be some sort of sound on it. Pad, I think. Length ball down the leg side, and Suryakumar misses the big leg-side whip"
+    },
+    {
+      "scoreboard_over": 4,
+      "scoreboard_ball": 4,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Wow. One-handed whip off the hip. Amazing. All bottom hand. Rishabh Pant plays a lot of top-hand-only shots, this one is entirely bottom hand. Back of a length at the hip, and he whips it over backward square leg with his left hand coming off the handle"
+    },
+    {
+      "scoreboard_over": 4,
+      "scoreboard_ball": 5,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Slower length ball at the pads, misses the flick and is hit on the leg. Pitched outside leg"
+    },
+    {
+      "scoreboard_over": 4,
+      "scoreboard_ball": 6,
+      "bowler": "Topley",
+      "batter": "Rohit Sharma",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Got him, Topley strikes with the slower ball. Back of a length, stays more or less stump-to-stump, and asks Rohit to take on the leg-side boundary while having to manufacture all the power himself. Goes hard at the wristy half-pull, half-flick, and hits it straight to the fielder at a square deep midwicket or a deep forward square leg, however you choose to describe him"
+    },
+    {
+      "scoreboard_over": 5,
+      "scoreboard_ball": 1,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball close to off stump, punched to cover point with an open face Gleeson continues, as Shreyas Iyer comes in at the non-striker's end."
+    },
+    {
+      "scoreboard_over": 5,
+      "scoreboard_ball": 2,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "There's that extra bounce again from Gleeson. Fairly full outside off, but not a half-volley, and it beats the outside edge as Suryakumar goes hard at an angled-bat cover drive"
+    },
+    {
+      "scoreboard_over": 5,
+      "scoreboard_ball": 3,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Full on middle stump, clipped to mid-on"
+    },
+    {
+      "scoreboard_over": 5,
+      "scoreboard_ball": 4,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "1 LEG BYE",
+      "runs_or_marker": "1lb",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 5,
+      "scoreboard_ball": 5,
+      "bowler": "Gleeson",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball on off stump, clipped gently towards mid-on for the quick single team configuration by t20 World Cup..there still seems to be one too many thoughts processes being tried..opening combo, pace bowlers, finisher batting position etc etc \" --I hear you, but most teams would try a number of different players in the lead up to a T20 World Cup, no?"
+    },
+    {
+      "scoreboard_over": 5,
+      "scoreboard_ball": 6,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball angling in towards off stump, shows the full face and pushes to mid-off, who's on the edge of the circle"
+    },
+    {
+      "scoreboard_over": 6,
+      "scoreboard_ball": 1,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Slants a fullish ball wide of off stump, and that's excellent wristwork from Suryakumar. There was a sweeper back at deep cover point, and he delays his contact with a twirl of the"
+    },
+    {
+      "scoreboard_over": 6,
+      "scoreboard_ball": 2,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "6",
+      "commentary": "What a shot! A shuffle across the stumps, and he's down on his back knee in a flash to whip this length ball up and over the backward square leg boundary"
+    },
+    {
+      "scoreboard_over": 6,
+      "scoreboard_ball": 3,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Back of a length, slower ball, nips away from the right-hander to finish around off stump. Goes back and across and punches to deep midwicket"
+    },
+    {
+      "scoreboard_over": 6,
+      "scoreboard_ball": 4,
+      "bowler": "Willey",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Slower ball, fullish, nipping away from off stump. Looks to drive into the covers, gets a thick inside-edge down to short fine leg"
+    },
+    {
+      "scoreboard_over": 6,
+      "scoreboard_ball": 5,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball finishing around middle stump, clipped to wide long-on"
+    },
+    {
+      "scoreboard_over": 6,
+      "scoreboard_ball": 6,
+      "bowler": "Willey",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "2 RUNS",
+      "runs_or_marker": "2",
+      "commentary": "Back of a length on off stump, punched into the gap between deep midwicket and long-on, and the latter fielder has to come quite a long way off the boundary, so they pick up an easy two"
+    },
+    {
+      "scoreboard_over": 7,
+      "scoreboard_ball": 1,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Length ball close to off stump, opens his bat face to punch to deep point Jordan. AUS VS SL 3RD T20 Shanaka's blistering performance\""
+    },
+    {
+      "scoreboard_over": 7,
+      "scoreboard_ball": 2,
+      "bowler": "Jordan",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Back of a length in the corridor, rides the bounce and defends to backward point, who seems to be a few yards closer to the bat than normal. Maybe a catcher for the uppish cut? And that brings up India's 50. Their required rate is now close to 13."
+    },
+    {
+      "scoreboard_over": 7,
+      "scoreboard_ball": 3,
+      "bowler": "Jordan",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Shortish on off stump, and there's the uppish cut after making a lot of room, but it's well controlled, bounces to the right of deep third"
+    },
+    {
+      "scoreboard_over": 7,
+      "scoreboard_ball": 4,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Terrific shot. Hard length close to off stump, and he hits it with a straight bat. Wow. Stays leg-side of the ball and punches on the up, over extra-cover. There's a sweeper back, but it's well in front of him, no chance of cutting it off"
+    },
+    {
+      "scoreboard_over": 7,
+      "scoreboard_ball": 5,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Slower offcutter at the body, tucked off the hip down to fine leg"
+    },
+    {
+      "scoreboard_over": 7,
+      "scoreboard_ball": 6,
+      "bowler": "Jordan",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball angling into off stump, punched towards mid-on"
+    },
+    {
+      "scoreboard_over": 8,
+      "scoreboard_ball": 1,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "FOURRUNS",
+      "runs_or_marker": "4",
+      "commentary": "Yup. Shortish, not a lot of turn away from off stump, but that's enough width as SKY leans back and chops down hard to cut it to the right of the diving backward point fielder Sukhanya : \"If SKY bats for 17 overs, India stand a chance! \" Liam Livingstone comes on to bowl his legspin, presumably."
+    },
+    {
+      "scoreboard_over": 8,
+      "scoreboard_ball": 2,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Better. Quick length ball turning from leg to middle. Can't create enough room to play that aggressively into the off side. Dabbed into the covers"
+    },
+    {
+      "scoreboard_over": 8,
+      "scoreboard_ball": 3,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "FOURRUNS",
+      "runs_or_marker": "4",
+      "commentary": "Superb shot. Back of a length on leg stump, and he stretches out for a shovel-whip over short fine leg. Those wrists are doing a lot of work today"
+    },
+    {
+      "scoreboard_over": 8,
+      "scoreboard_ball": 4,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "FOURRUNS",
+      "runs_or_marker": "4",
+      "commentary": "Full on off stump, and Suryakumar brings out one of his favourite shots. The wristy whip to the right of long-on, and it's hit with enough power to leave that fielder sprinting uselessly Photos 8.4 1w LIVINGSTONE TO SURYAKUMAR, 1 WIDE Seam-up, angling down leg. Misses the flick and there's an appeal for a stumping but he was very much in his crease"
+    },
+    {
+      "scoreboard_over": 8,
+      "scoreboard_ball": 5,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Length ball straightening towards off stump, stays leg-side of the ball and chops into the point region"
+    },
+    {
+      "scoreboard_over": 8,
+      "scoreboard_ball": 6,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "2 RUNS",
+      "runs_or_marker": "2",
+      "commentary": "Back of a length on middle and leg, worked away into the on side, and deep midwicket has to come in a fair distance off the boundary. Two more, and India take 15 off the over"
+    },
+    {
+      "scoreboard_over": 9,
+      "scoreboard_ball": 1,
+      "bowler": "Moeen Ali",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "2 RUNS",
+      "runs_or_marker": "2",
+      "commentary": "Steps out first ball to a flighted ball close to off stump, and whips powerfully to the right of long-on. Any other fielder there, and it was four, but Jordan sprints quickly, dives to his right, and palms it firmly to Willey coming the other way from deep midwicket"
+    },
+    {
+      "scoreboard_over": 9,
+      "scoreboard_ball": 2,
+      "bowler": "Moeen Ali",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "A clear expletive from Iyer after he misses the cut. It was short and wide, so he genuinely missed out"
+    },
+    {
+      "scoreboard_over": 9,
+      "scoreboard_ball": 3,
+      "bowler": "Moeen Ali",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "6",
+      "commentary": "Moeen follows up with a hit-me full-toss on the stumps, and Iyer clears his front leg and wallops it for six. Doesn't hit it as cleanly as he'd like, but it's always clearing Willey moving to his left at deep midwicket. Plus Willey trips on the boundary cushions Photos"
+    },
+    {
+      "scoreboard_over": 9,
+      "scoreboard_ball": 4,
+      "bowler": "Moeen Ali",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Down the track now, Moeen flights it wider, and Iyer drives firmly but can't beat extra-cover"
+    },
+    {
+      "scoreboard_over": 9,
+      "scoreboard_ball": 5,
+      "bowler": "Moeen Ali",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 9,
+      "scoreboard_ball": 6,
+      "bowler": "Moeen Ali",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Full outside off, whipped down to long-on 9.6 1w MOEEN ALI TO SURYAKUMAR, 1 WIDE Looks to keep it out of SKY's hitting arc, and ends up firing one well wide of the off-side tramline. Left alone"
+    },
+    {
+      "scoreboard_over": 10,
+      "scoreboard_ball": 1,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Yorker, speared in at the toes, and clipped to the midwicket sweeper Greetings. This partnership is just beginning to cook. And meanwhile, in a parallel universe on Centre Court, this is the state of play... India are 82/3 game on.\" Chris Jordan is back India have closed the gap quite well over these last four overs. Here's Miller once more."
+    },
+    {
+      "scoreboard_over": 10,
+      "scoreboard_ball": 2,
+      "bowler": "Jordan",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Back of a length, hops into line as the ball climbs into his splice, dabbed down to third man"
+    },
+    {
+      "scoreboard_over": 10,
+      "scoreboard_ball": 3,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "2 RUNS",
+      "runs_or_marker": "2",
+      "commentary": "Flicked out to wide long-on, full once more from Jordan entire series as an experiment. \" Seeing as they are missing Bairstow, Stokes, Wood,"
+    },
+    {
+      "scoreboard_over": 10,
+      "scoreboard_ball": 4,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Right up to the blockhole, a good over so far, plugged back to the bowler"
+    },
+    {
+      "scoreboard_over": 10,
+      "scoreboard_ball": 5,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Outstanding strike! Willed up and over long-off, with a waggle of the hips in the followthrough for good measure! Hitting out of the full length, one bounce, just inside the rope! Photos"
+    },
+    {
+      "scoreboard_over": 10,
+      "scoreboard_ball": 6,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Fires in the yorker, scuffed to Willey in the covers, the shy comes in and it might have been tight... but safe in the end"
+    },
+    {
+      "scoreboard_over": 11,
+      "scoreboard_ball": 1,
+      "bowler": "Topley",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Round the wicket, full length on the front foot, pushed to cover and SKY completes an excellent fifty with a quick single"
+    },
+    {
+      "scoreboard_over": 11,
+      "scoreboard_ball": 2,
+      "bowler": "Topley",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Over the wicket now, full length on off, tapped to mid-off"
+    },
+    {
+      "scoreboard_over": 11,
+      "scoreboard_ball": 3,
+      "bowler": "Topley",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Slower ball, clothed out to deep midwicket, picking up the length and swinging through it. Roy slides round well to gather"
+    },
+    {
+      "scoreboard_over": 11,
+      "scoreboard_ball": 4,
+      "bowler": "Topley",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Fired past the legs, looks like a wide but might have flicked something on the way through to Buttler"
+    },
+    {
+      "scoreboard_over": 11,
+      "scoreboard_ball": 5,
+      "bowler": "Topley",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Hits the pitch from over the wicket, a cramped pull rolls out to square leg"
+    },
+    {
+      "scoreboard_over": 11,
+      "scoreboard_ball": 6,
+      "bowler": "Topley",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Guided with an open face, out of the blockhole from round the wicket, out to extra cover. That's a fine over, just five from it, as the screw tightens a touch"
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 1,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "SIXRUNS",
+      "runs_or_marker": "6",
+      "commentary": "Not any more he doesn't! First ball, down on one knee, swept from a tight line, up and over the short backward square boundary!"
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 2,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Over the wicket, dips on a very full length, that's well bowled, and draws out a respectful drive to long-off"
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 3,
+      "bowler": "Livingstone",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "SIXRUNS",
+      "runs_or_marker": "6",
+      "commentary": "Clattered magnificently over long-on! All in the wrists as he shuffled to the length and launched high over the ropes! Reverses his stance, and Livingstone pulls out late"
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 4,
+      "bowler": "Livingstone",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "NORUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Reverse sweep, and a loud expletive as he tumbles over and misses out on a flurry of bat-speed selectors to becoming a mainstay of the Indian team, what a journey it has been for Surya Kumar Yadav. He is keeping India in the game,\""
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 5,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "SIXRUNS",
+      "runs_or_marker": "6",
+      "commentary": "Free hit, back of a length, and SKY sends it skywards! Sits up, Yadav"
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 5,
+      "bowler": "Livingstone",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "(NOBALL) 1 RUN",
+      "runs_or_marker": "2nb",
+      "commentary": "Back of a length, straightens from middle and leg, tucked to the on-side... and a no-ball... oh dear"
+    },
+    {
+      "scoreboard_over": 12,
+      "scoreboard_ball": 6,
+      "bowler": "Livingstone",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Turn past the edge and an appeal for the stumping. Good finish to the elongated over, pushing through the line of the ball, just a hint of grip, beats the edge and the toe is grounded despite some smart glovework"
+    },
+    {
+      "scoreboard_over": 13,
+      "scoreboard_ball": 1,
+      "bowler": "Gleeson",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Hits the pitch hard, back of a length, Moeen slides at point and misfields but the sweeper tidies up Back comes Gleeson. He's been exceptional in his six-over England career... two more today!"
+    },
+    {
+      "scoreboard_over": 13,
+      "scoreboard_ball": 2,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "6",
+      "commentary": "Opens the face, and poked up and over extra cover! Remarkable strike, just chose his angle, and laser-guided it with a flick of the wrists up through the ball!"
+    },
+    {
+      "scoreboard_over": 13,
+      "scoreboard_ball": 3,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 13,
+      "scoreboard_ball": 4,
+      "bowler": "Gleeson",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Walks across his stumps, a wristy flick across the line but the square leg sweeper is set back to gather Prithvi : \"England's 5th bowler today so far : 3 overs 47 runs. \" Indeed... this chase is still very on..."
+    },
+    {
+      "scoreboard_over": 13,
+      "scoreboard_ball": 5,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Slower ball, but on the pads. Yadav turns his stance inside-out, waits for it to arrive, helps it up and through fine leg. A couple of bounces into the rope!"
+    },
+    {
+      "scoreboard_over": 13,
+      "scoreboard_ball": 6,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "2 RUNS",
+      "runs_or_marker": "2",
+      "commentary": "Yorker, swinging into the toes, flicked to deep midwicket, and they rush back for two. 15 in the over, to stay inches ahead of the RRR! And the 101 partnership comes up from 57 balls"
+    },
+    {
+      "scoreboard_over": 14,
+      "scoreboard_ball": 1,
+      "bowler": "Jordan",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Digging out the full length, poked out to point Matt Roller is scratching his chin: \"Wonder if England's best bet at the moment is to"
+    },
+    {
+      "scoreboard_over": 14,
+      "scoreboard_ball": 2,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Outstanding sweep! A fairly pinpoint legstump yorker, but down into position so early, moving to off to open the angle, and flicking it so fine!"
+    },
+    {
+      "scoreboard_over": 14,
+      "scoreboard_ball": 3,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Flashed out of the full length! A dipping yorker from Jordan, but SKY opens his stance, frees his hands, and pierces the cover ring"
+    },
+    {
+      "scoreboard_over": 14,
+      "scoreboard_ball": 4,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Into the pitch, pulled to the leg side, cramped for room but another single"
+    },
+    {
+      "scoreboard_over": 14,
+      "scoreboard_ball": 5,
+      "bowler": "Jordan",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Walks to the off-side, was aiming slightly behind square, but another single, and it's 12 off the over already Sandeep J\ue092 \"So Iyer doing a Dhoni to the chase by playing dots..\" He's doing the needful right now, just handing the strike back mainly!"
+    },
+    {
+      "scoreboard_over": 14,
+      "scoreboard_ball": 6,
+      "bowler": "Jordan",
+      "batter": "Suryakumar",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 15,
+      "scoreboard_ball": 1,
+      "bowler": "Topley",
+      "batter": "Shreyas Iyer",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Iyer makes room to leg, and steers the catch to Buttler! Topley follows him with the back-of-a-length delivery, and gets cramped on his attempted dab through third man. A thin deflection and not much celebration from England... perhaps they recognise it's the other bloke they need! Shreyas Iyer c \u2020Buttler b Topley 28 \ue08123b 0x4 2x6 54m) SR\ue092 121.73 England were 152 for 3 at this stage... told you they needed 230!"
+    },
+    {
+      "scoreboard_over": 15,
+      "scoreboard_ball": 2,
+      "bowler": "Topley",
+      "batter": "Karthik",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Good deck-hitting intro! Pushed across the right-hander, nipping away, DK is lured outside his eyeline and misses Hello DK. With five balls of lovely, lovely pace to face"
+    },
+    {
+      "scoreboard_over": 15,
+      "scoreboard_ball": 3,
+      "bowler": "Topley",
+      "batter": "Karthik",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Brilliant... a scamper to the pitch, but Topley's hard length hops past the edge once more"
+    },
+    {
+      "scoreboard_over": 15,
+      "scoreboard_ball": 4,
+      "bowler": "Topley",
+      "batter": "Karthik",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Hard length again, and DK climbs into the pull but can't get on top of"
+    },
+    {
+      "scoreboard_over": 15,
+      "scoreboard_ball": 5,
+      "bowler": "Topley",
+      "batter": "Karthik",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Rocks back, settles for the tap to third man. Wonderful over, can SKY dent it, or does he settle for taking the strike back?"
+    },
+    {
+      "scoreboard_over": 15,
+      "scoreboard_ball": 6,
+      "bowler": "Topley",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Opens the face, on the back foot, lots of width, and dabbed through the gap at third man! Topley's figures get dented at the death, but 3 for 22 in this onslaught is outstanding"
+    },
+    {
+      "scoreboard_over": 16,
+      "scoreboard_ball": 1,
+      "bowler": "Willey",
+      "batter": "Karthik",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "DK leans into the full length, and launches it! Wide line, inviting him to free his arms, and one bounce over wide long-off you can't afford a single bad over like India got in the 16th\" Indeed. But England yet have to burgle an over from their fifth bowler the team batting first were 100 for 3 after 20 overs\" brings back nervy memories of LOIs in 1990s. Strangely the worm doesn't have the same oomph. \""
+    },
+    {
+      "scoreboard_over": 16,
+      "scoreboard_ball": 2,
+      "bowler": "Willey",
+      "batter": "Karthik",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Sits up in the pitch, a flat pull to the midwicket sweeper, SKY gets the strike back, he hasn't seen much of it of late... 16.2 1w WILLEY TO KARTHIK, 1 WIDE Wide line, tight to the tramlines but just the wrong side of them as DK attempts a deflection through third man"
+    },
+    {
+      "scoreboard_over": 16,
+      "scoreboard_ball": 3,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Squirted away through third man! An outswinging full toss, picked off like the ripest tomato, and that is a truly wonderful hundred, from 48 balls! Photos"
+    },
+    {
+      "scoreboard_over": 16,
+      "scoreboard_ball": 4,
+      "bowler": "Willey",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Driven out of the full length, hint of inswing, up and over mid-on, for Jordan to sweep up on the rope"
+    },
+    {
+      "scoreboard_over": 16,
+      "scoreboard_ball": 5,
+      "bowler": "Willey",
+      "batter": "Karthik",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": ""
+    },
+    {
+      "scoreboard_over": 16,
+      "scoreboard_ball": 6,
+      "bowler": "Willey",
+      "batter": "Jadeja",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Inswinger to the left-hander, very full stump-threatening length, scuffed to the leg-side, off an under-edge"
+    },
+    {
+      "scoreboard_over": 17,
+      "scoreboard_ball": 1,
+      "bowler": "Gleeson",
+      "batter": "Jadeja",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Beautiful yorker, over the wicket, speared at the left-hander's off stump and dug out back to the bowler England have one over of spin to burgle. Not yet... it's Gleeson first, trying to make it nigh on impossible for that final over"
+    },
+    {
+      "scoreboard_over": 17,
+      "scoreboard_ball": 2,
+      "bowler": "Gleeson",
+      "batter": "Jadeja",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "6",
+      "commentary": "Pumped over the bowler's head! Misses his mark by inches this time, a low full-toss and Jadeja pumps with clean lines over long-off! Photos"
+    },
+    {
+      "scoreboard_over": 17,
+      "scoreboard_ball": 3,
+      "bowler": "Gleeson",
+      "batter": "Jadeja",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Yorker, gone! Jadeaj reviews, but this might be optimistic as I think that hit him on the full... dipping right into the toes... in fact, it might have been millimetres short of his boot, but no bat involved, so all on ball tracker... which is taking an eternity... but that's very out! Splintering the stumps from a middle-and-leg point of impact, and this gamble to go to"
+    },
+    {
+      "scoreboard_over": 17,
+      "scoreboard_ball": 4,
+      "bowler": "Gleeson",
+      "batter": "Harshal",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Another yorker, pinpoint again, cracked hard to short cover Harshal Patel is the next man in. Three balls in this over"
+    },
+    {
+      "scoreboard_over": 17,
+      "scoreboard_ball": 5,
+      "bowler": "Gleeson",
+      "batter": "Harshal",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Misses the yorker this time, but the low full-toss is straight enough to be cut off at long-off... just the single. How does Yadav play this last ball?"
+    },
+    {
+      "scoreboard_over": 17,
+      "scoreboard_ball": 6,
+      "bowler": "Gleeson",
+      "batter": "Suryakumar",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Another yorker, tucked to the on-side, they take the single so Yadav keeps the strike, but Gleeson has done the needful at the moment it most mattered"
+    },
+    {
+      "scoreboard_over": 18,
+      "scoreboard_ball": 1,
+      "bowler": "Moeen Ali",
+      "batter": "Suryakumar",
+      "outcome_text": "FOURRUNS",
+      "runs_or_marker": "4",
+      "commentary": "Chopped up and over third man! Opens the face to capitalise on the width, and that's five from one legal ball... 18.1 1w MOEEN ALI TO SURYAKUMAR, 1 WIDE Short and wide, a good tactic, but too wide of off, keeping it out of Sky's hitting arc"
+    },
+    {
+      "scoreboard_over": 18,
+      "scoreboard_ball": 2,
+      "bowler": "Moeen Ali",
+      "batter": "Suryakumar",
+      "outcome_text": "SIX RUNS",
+      "runs_or_marker": "6",
+      "commentary": "Blasted over long-on! Leaning out of his crease, creaming the length, hitting through the spin!"
+    },
+    {
+      "scoreboard_over": 18,
+      "scoreboard_ball": 3,
+      "bowler": "Moeen Ali",
+      "batter": "Suryakumar",
+      "outcome_text": "FOURRUNS",
+      "runs_or_marker": "4",
+      "commentary": "Mashed through backward point! Have England gone to spin too soon? England have about 30 seconds to finish the over or they will be penalised an out-fielder for the final over 18.3 1w MOEEN ALI TO SURYAKUMAR, 1 WIDE Too much width, can't connect, and it's another wide"
+    },
+    {
+      "scoreboard_over": 18,
+      "scoreboard_ball": 4,
+      "bowler": "Moeen Ali",
+      "batter": "Suryakumar",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Attempted nurdle to the leg side, trying to sweep through the gap. Can't beat the field"
+    },
+    {
+      "scoreboard_over": 18,
+      "scoreboard_ball": 5,
+      "bowler": "Moeen Ali",
+      "batter": "Suryakumar",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Toe-ended to Salt at long-off! Is that the game! Hitting up and through the length ball, wide line again, but for once Yadav's clean hitting let him down, a well judged take, completed"
+    },
+    {
+      "scoreboard_over": 18,
+      "scoreboard_ball": 6,
+      "bowler": "Moeen Ali",
+      "batter": "Harshal",
+      "outcome_text": "FOUR RUNS",
+      "runs_or_marker": "4",
+      "commentary": "Hoisted up and over the leg side! Square leg is up, and that just dribbles away as he gives chase... The end of a magnificent innings, but India will rue the lack of support at the top ... or will they? Seven balls to batter 25!"
+    },
+    {
+      "scoreboard_over": 19,
+      "scoreboard_ball": 1,
+      "bowler": "Jordan",
+      "batter": "Avesh Khan",
+      "outcome_text": "1 RUN",
+      "runs_or_marker": "1",
+      "commentary": "Yorker, dipping on the full length, clubbed to long-on and Harshal is back on strike Five fielders in the inner circle, four on the off-side, plus a fine leg So, 21 to win, with Jordan set to bowl with one too few outfielders, due to England's tardy over-rate. Or 20 runs for the Super Over... lasted. Perhaps even the best T20I hundred I've ever seen!\""
+    },
+    {
+      "scoreboard_over": 19,
+      "scoreboard_ball": 2,
+      "bowler": "Jordan",
+      "batter": "Harshal",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Low full toss, whipped on the up to the leg side. No single this time,"
+    },
+    {
+      "scoreboard_over": 19,
+      "scoreboard_ball": 3,
+      "bowler": "Jordan",
+      "batter": "Harshal",
+      "outcome_text": "NO RUN",
+      "runs_or_marker": "\u2022",
+      "commentary": "Yorker again, swinging onto the toes, that's an excellent ball at any moment, not least now Praveen Kumar: \"65 off 59 is all what others managed and yet we had a game till 19TH over. Take a bow SA Yadav.\""
+    },
+    {
+      "scoreboard_over": 19,
+      "scoreboard_ball": 4,
+      "bowler": "Jordan",
+      "batter": "Harshal",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Another yorker, an attempted scoop, decent contact but Gleeson is well placed on the 45 and swallows the looping chance! Harshal Patel c Gleeson b Jordan 5 \ue0816b 1x4 0x6 13m) SR\ue092 83.33 No extras and it's done"
+    },
+    {
+      "scoreboard_over": 19,
+      "scoreboard_ball": 5,
+      "bowler": "Jordan",
+      "batter": "Ravi Bishnoi",
+      "outcome_text": "2 RUNS",
+      "runs_or_marker": "2",
+      "commentary": "Rocks back, blatted towards the cover sweeper, who tumbles well to gather Prithvi : \"Jordan scored crucial runs in the 20th over of England innings and now back to save crucial runs in 20th over of Indian innings. \" What an allrounder"
+    },
+    {
+      "scoreboard_over": 19,
+      "scoreboard_ball": 6,
+      "bowler": "Jordan",
+      "batter": "Ravi Bishnoi",
+      "outcome_text": "OUT",
+      "runs_or_marker": "W",
+      "commentary": "Inswinging yorker, back goes off stump! That's an exceptional way to"
+    }
+  ]
+}

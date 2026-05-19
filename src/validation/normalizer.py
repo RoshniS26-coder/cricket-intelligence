@@ -4,17 +4,83 @@ Ensures Gemini outputs conform to schema and normalizes fuzzy text to enums.
 """
 
 import re
+from pathlib import Path
 from typing import Optional
 
+import yaml
 from rich.console import Console
 
 from src.intelligence.schema import (
     BallRecord, Line, Length, ShotType, BowlerType,
     Footwork, ContactQuality, Outcome, Variation,
     BounceBehavior, Movement,
+    SwingDirection, SwingType, SpinDirection, BallAgePhase,
+    InningsPhase,
 )
 
 console = Console()
+
+# ===== Player Name Canonicalisation =====
+# Loaded once from data/player_aliases.yaml. Curate that file as you spot
+# new short-forms in Gemini output.
+
+_PLAYER_ALIASES_PATH = Path("data/player_aliases.yaml")
+_PLAYER_ALIASES_CACHE: dict[str, str] | None = None
+
+
+def _load_player_aliases() -> dict[str, str]:
+    """Lazy-load player aliases YAML (case-insensitive lookup)."""
+    global _PLAYER_ALIASES_CACHE
+    if _PLAYER_ALIASES_CACHE is not None:
+        return _PLAYER_ALIASES_CACHE
+    if not _PLAYER_ALIASES_PATH.exists():
+        _PLAYER_ALIASES_CACHE = {}
+        return _PLAYER_ALIASES_CACHE
+    try:
+        data = yaml.safe_load(_PLAYER_ALIASES_PATH.read_text()) or {}
+        raw = data.get("aliases", {}) or {}
+        _PLAYER_ALIASES_CACHE = {k.strip().lower(): v.strip() for k, v in raw.items()}
+    except Exception as e:
+        console.print(f"[yellow]⚠ player_aliases.yaml parse failed: {e}[/yellow]")
+        _PLAYER_ALIASES_CACHE = {}
+    return _PLAYER_ALIASES_CACHE
+
+
+def resolve_player_name(name: Optional[str]) -> Optional[str]:
+    """Replace short-form / partial player names with canonical full names.
+    Returns the input unchanged if no alias is registered. None-safe."""
+    if not name:
+        return name
+    aliases = _load_player_aliases()
+    return aliases.get(name.strip().lower(), name)
+
+
+# ===== Innings-Phase Derivation =====
+# T20: PP=1-6, middle=7-15, death=16-20.
+# ODI: PP=1-10, middle=11-40, death=41-50.
+# Anything else (Test / nets / unknown format) → UNKNOWN.
+
+def derive_phase(over: int, format_str: str = "T20") -> InningsPhase:
+    """Derive innings phase from over number + match format. Returns UNKNOWN
+    if the over is missing or the format doesn't have phase semantics."""
+    if not over or over < 1:
+        return InningsPhase.UNKNOWN
+    fmt = (format_str or "").upper()
+    if fmt in ("T20", "T20I"):
+        if 1 <= over <= 6:
+            return InningsPhase.POWERPLAY
+        if 7 <= over <= 15:
+            return InningsPhase.MIDDLE_OVERS
+        if 16 <= over <= 20:
+            return InningsPhase.DEATH
+    elif fmt in ("ODI", "OD"):
+        if 1 <= over <= 10:
+            return InningsPhase.POWERPLAY
+        if 11 <= over <= 40:
+            return InningsPhase.MIDDLE_OVERS
+        if 41 <= over <= 50:
+            return InningsPhase.DEATH
+    return InningsPhase.UNKNOWN
 
 
 # ===== Normalization Maps =====
@@ -87,45 +153,161 @@ LENGTH_NORMALIZATIONS = {
 }
 
 SHOT_NORMALIZATIONS = {
+    # Drive family — prefer specific subtypes
     "drive": ShotType.DRIVE,
-    "cover drive": ShotType.DRIVE,
-    "straight drive": ShotType.DRIVE,
-    "on drive": ShotType.DRIVE,
-    "off drive": ShotType.DRIVE,
+    "cover drive": ShotType.COVER_DRIVE,
+    "cover-drive": ShotType.COVER_DRIVE,
+    "cover_drive": ShotType.COVER_DRIVE,
+    "straight drive": ShotType.STRAIGHT_DRIVE,
+    "straight-drive": ShotType.STRAIGHT_DRIVE,
+    "straight_drive": ShotType.STRAIGHT_DRIVE,
+    "on drive": ShotType.ON_DRIVE,
+    "on-drive": ShotType.ON_DRIVE,
+    "on_drive": ShotType.ON_DRIVE,
+    "off drive": ShotType.OFF_DRIVE,
+    "off-drive": ShotType.OFF_DRIVE,
+    "off_drive": ShotType.OFF_DRIVE,
+    "square drive": ShotType.SQUARE_DRIVE,
+    "square_drive": ShotType.SQUARE_DRIVE,
+
+    # Cut family
     "cut": ShotType.CUT,
-    "square cut": ShotType.CUT,
-    "late cut": ShotType.CUT,
-    "upper cut": ShotType.CUT,
+    "square cut": ShotType.SQUARE_CUT,
+    "square_cut": ShotType.SQUARE_CUT,
+    "late cut": ShotType.LATE_CUT,
+    "late_cut": ShotType.LATE_CUT,
+    "upper cut": ShotType.UPPER_CUT,
+    "upper_cut": ShotType.UPPER_CUT,
+
+    # Pull / hook
     "pull": ShotType.PULL,
     "pull shot": ShotType.PULL,
     "hook": ShotType.HOOK,
     "hook shot": ShotType.HOOK,
+
+    # Defense family — prefer specific subtypes
     "defend": ShotType.DEFEND,
     "defensive": ShotType.DEFEND,
     "block": ShotType.DEFEND,
-    "forward defense": ShotType.DEFEND,
-    "forward defence": ShotType.DEFEND,
-    "back foot defense": ShotType.DEFEND,
-    "back foot defence": ShotType.DEFEND,
+    "forward defense": ShotType.FRONT_FOOT_DEFENCE,
+    "forward defence": ShotType.FRONT_FOOT_DEFENCE,
+    "front foot defense": ShotType.FRONT_FOOT_DEFENCE,
+    "front foot defence": ShotType.FRONT_FOOT_DEFENCE,
+    "front-foot defence": ShotType.FRONT_FOOT_DEFENCE,
+    "front_foot_defence": ShotType.FRONT_FOOT_DEFENCE,
+    "back foot defense": ShotType.BACK_FOOT_DEFENCE,
+    "back foot defence": ShotType.BACK_FOOT_DEFENCE,
+    "back-foot defence": ShotType.BACK_FOOT_DEFENCE,
+    "back_foot_defence": ShotType.BACK_FOOT_DEFENCE,
+
+    # Sweep family
     "sweep": ShotType.SWEEP,
     "sweep shot": ShotType.SWEEP,
-    "slog sweep": ShotType.SWEEP,
+    "conventional sweep": ShotType.SWEEP,
+    "slog sweep": ShotType.SLOG_SWEEP,
+    "slog_sweep": ShotType.SLOG_SWEEP,
+    "paddle sweep": ShotType.PADDLE_SWEEP,
+    "paddle_sweep": ShotType.PADDLE_SWEEP,
     "reverse sweep": ShotType.REVERSE_SWEEP,
+    "reverse_sweep": ShotType.REVERSE_SWEEP,
     "reverse": ShotType.REVERSE_SWEEP,
+
+    # Wristy / leg-side
     "glance": ShotType.GLANCE,
-    "leg glance": ShotType.GLANCE,
+    "leg glance": ShotType.LEG_GLANCE,
+    "leg-glance": ShotType.LEG_GLANCE,
+    "leg_glance": ShotType.LEG_GLANCE,
+    "fine glance": ShotType.LEG_GLANCE,
     "flick": ShotType.FLICK,
     "wrist flick": ShotType.FLICK,
+    "wristy flick": ShotType.FLICK,
     "clip": ShotType.FLICK,
+
+    # Aerial / innovation
     "lofted": ShotType.LOFTED,
     "lofted shot": ShotType.LOFTED,
     "slog": ShotType.LOFTED,
     "big shot": ShotType.LOFTED,
     "aerial": ShotType.LOFTED,
+    "helicopter": ShotType.HELICOPTER,
+    "helicopter shot": ShotType.HELICOPTER,
+    "scoop": ShotType.SCOOP,
+    "ramp": ShotType.SCOOP,
+    "ramp shot": ShotType.SCOOP,
+    "dilscoop": ShotType.SCOOP,
+
+    # Leave
     "leave": ShotType.LEAVE,
     "left alone": ShotType.LEAVE,
     "shouldered arms": ShotType.LEAVE,
     "no shot": ShotType.LEAVE,
+}
+
+SWING_DIRECTION_NORMALIZATIONS = {
+    "in-swing": SwingDirection.IN_SWING,
+    "in swing": SwingDirection.IN_SWING,
+    "inswing": SwingDirection.IN_SWING,
+    "inswinger": SwingDirection.IN_SWING,
+    "swinging in": SwingDirection.IN_SWING,
+    "tailing in": SwingDirection.IN_SWING,
+    "out-swing": SwingDirection.OUT_SWING,
+    "out swing": SwingDirection.OUT_SWING,
+    "outswing": SwingDirection.OUT_SWING,
+    "outswinger": SwingDirection.OUT_SWING,
+    "swinging away": SwingDirection.OUT_SWING,
+    "leaving the batsman": SwingDirection.OUT_SWING,
+    "shaping away": SwingDirection.OUT_SWING,
+}
+
+SWING_TYPE_NORMALIZATIONS = {
+    "conventional swing": SwingType.CONVENTIONAL,
+    "conventional": SwingType.CONVENTIONAL,
+    "late swing": SwingType.LATE,
+    "late movement": SwingType.LATE,
+    "hooping late": SwingType.LATE,
+    "reverse swing": SwingType.REVERSE,
+    "reverse": SwingType.REVERSE,
+    "reversing": SwingType.REVERSE,
+}
+
+SPIN_DIRECTION_NORMALIZATIONS = {
+    "off break": SpinDirection.OFF_BREAK,
+    "off-break": SpinDirection.OFF_BREAK,
+    "offbreak": SpinDirection.OFF_BREAK,
+    "off spin": SpinDirection.OFF_BREAK,
+    "off-spin": SpinDirection.OFF_BREAK,
+    "offspin": SpinDirection.OFF_BREAK,
+    "turning in": SpinDirection.OFF_BREAK,
+    "leg break": SpinDirection.LEG_BREAK,
+    "leg-break": SpinDirection.LEG_BREAK,
+    "legbreak": SpinDirection.LEG_BREAK,
+    "leg spin": SpinDirection.LEG_BREAK,
+    "leg-spin": SpinDirection.LEG_BREAK,
+    "turning away": SpinDirection.LEG_BREAK,
+    "googly": SpinDirection.GOOGLY,
+    "wrong-un": SpinDirection.GOOGLY,
+    "wrong un": SpinDirection.GOOGLY,
+    "arm ball": SpinDirection.ARM_BALL,
+    "arm-ball": SpinDirection.ARM_BALL,
+    "slider": SpinDirection.SLIDER,
+    "doosra": SpinDirection.DOOSRA,
+    "carrom": SpinDirection.CARROM,
+    "carrom ball": SpinDirection.CARROM,
+    "top spin": SpinDirection.TOP_SPIN,
+    "top-spin": SpinDirection.TOP_SPIN,
+    "topspinner": SpinDirection.TOP_SPIN,
+}
+
+BALL_AGE_NORMALIZATIONS = {
+    "new ball": BallAgePhase.NEW_BALL,
+    "new-ball": BallAgePhase.NEW_BALL,
+    "shiny new": BallAgePhase.NEW_BALL,
+    "old ball": BallAgePhase.OLD,
+    "old-ball": BallAgePhase.OLD,
+    "older ball": BallAgePhase.OLD,
+    "worn ball": BallAgePhase.OLD,
+    "reverse window": BallAgePhase.REVERSE_WINDOW,
+    "reverse swing window": BallAgePhase.REVERSE_WINDOW,
 }
 
 OUTCOME_NORMALIZATIONS = {
@@ -191,14 +373,42 @@ def normalize_field(value: str, normalization_map: dict, default=None):
 class BallRecordValidator:
     """Validates and normalizes ball records."""
 
-    def validate_record(self, record: BallRecord) -> tuple[BallRecord, list[str]]:
+    def validate_record(self, record: BallRecord, format_str: str = "T20") -> tuple[BallRecord, list[str]]:
         """
         Validate and normalize a BallRecord.
+
+        Args:
+            record:     BallRecord to normalize.
+            format_str: Match format ("T20" | "ODI" | "Test" | "nets") used for phase
+                        derivation. Default T20.
 
         Returns:
             Tuple of (normalized record, list of warnings)
         """
         warnings = []
+
+        # ── Player-name canonicalisation (Tier-1 analytics enrichment) ──
+        # Replace "Iyer" → "Shreyas Iyer" etc. so per-batsman queries don't
+        # split across short and long forms.
+        original_batsman = record.batsman_name
+        original_bowler = record.bowler_name
+        record.batsman_name = resolve_player_name(record.batsman_name)
+        record.bowler_name = resolve_player_name(record.bowler_name)
+        if original_batsman and record.batsman_name != original_batsman:
+            warnings.append(
+                f"Canonicalised batsman_name: '{original_batsman}' → '{record.batsman_name}'"
+            )
+        if original_bowler and record.bowler_name != original_bowler:
+            warnings.append(
+                f"Canonicalised bowler_name: '{original_bowler}' → '{record.bowler_name}'"
+            )
+
+        # ── Phase derivation ──
+        # If Gemini left phase=UNKNOWN, derive from over + format. Trust Gemini if it set it.
+        if record.phase == InningsPhase.UNKNOWN:
+            derived = derive_phase(record.over, format_str)
+            if derived != InningsPhase.UNKNOWN:
+                record.phase = derived
 
         # Normalize fields if they contain fuzzy text
         if record.raw_description:
@@ -220,6 +430,63 @@ class BallRecordValidator:
                 if inferred_length != Length.UNKNOWN:
                     record.length = inferred_length
                     warnings.append(f"Inferred length '{inferred_length.value}' from description")
+
+            # Infer delivery sub-type from raw description when Gemini left it unknown.
+            # These are conservative — normalize_field only flips UNKNOWN → known.
+            if record.swing_direction == SwingDirection.UNKNOWN:
+                inferred = normalize_field(
+                    record.raw_description, SWING_DIRECTION_NORMALIZATIONS, SwingDirection.UNKNOWN
+                )
+                if inferred != SwingDirection.UNKNOWN:
+                    record.swing_direction = inferred
+                    warnings.append(f"Inferred swing_direction '{inferred.value}' from description")
+
+            if record.swing_type == SwingType.UNKNOWN:
+                inferred = normalize_field(
+                    record.raw_description, SWING_TYPE_NORMALIZATIONS, SwingType.UNKNOWN
+                )
+                if inferred != SwingType.UNKNOWN:
+                    record.swing_type = inferred
+                    warnings.append(f"Inferred swing_type '{inferred.value}' from description")
+
+            if record.spin_direction == SpinDirection.UNKNOWN:
+                inferred = normalize_field(
+                    record.raw_description, SPIN_DIRECTION_NORMALIZATIONS, SpinDirection.UNKNOWN
+                )
+                if inferred != SpinDirection.UNKNOWN:
+                    record.spin_direction = inferred
+                    warnings.append(f"Inferred spin_direction '{inferred.value}' from description")
+
+            if record.ball_age_phase == BallAgePhase.UNKNOWN:
+                inferred = normalize_field(
+                    record.raw_description, BALL_AGE_NORMALIZATIONS, BallAgePhase.UNKNOWN
+                )
+                if inferred != BallAgePhase.UNKNOWN:
+                    record.ball_age_phase = inferred
+                    warnings.append(f"Inferred ball_age_phase '{inferred.value}' from description")
+
+            # Consistency: spin_direction only meaningful for spin bowling
+            if record.bowler_type == BowlerType.PACE and record.spin_direction not in (
+                SpinDirection.NONE, SpinDirection.UNKNOWN
+            ):
+                warnings.append(
+                    f"Clearing spin_direction '{record.spin_direction.value}' for pace bowler"
+                )
+                record.spin_direction = SpinDirection.NONE
+
+            # Consistency: swing fields only meaningful for pace bowling
+            if record.bowler_type == BowlerType.SPIN and record.swing_direction not in (
+                SwingDirection.NONE, SwingDirection.UNKNOWN
+            ):
+                warnings.append(
+                    f"Clearing swing_direction '{record.swing_direction.value}' for spin bowler"
+                )
+                record.swing_direction = SwingDirection.NONE
+
+            if record.bowler_type == BowlerType.SPIN and record.swing_type not in (
+                SwingType.NONE, SwingType.UNKNOWN
+            ):
+                record.swing_type = SwingType.NONE
 
         # Cross-field consistency checks
         if record.shot_type == ShotType.LEAVE and record.contact_quality != ContactQuality.MISS:

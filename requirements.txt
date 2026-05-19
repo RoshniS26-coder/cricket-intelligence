@@ -36,6 +36,19 @@ uvicorn>=0.27.0
 # ===== Review UI =====
 streamlit>=1.31.0
 
+# ===== Pose Estimation (Phase 1) =====
+# mediapipe: landmark detection for batsman technique features.
+# NOTE: as of early 2026 mediapipe supports Python ≤3.12 on macOS.
+# If you're on Python 3.14, create a secondary venv with python3.12 and
+# install there, then point render scripts to it via PYTHON interpreter path.
+mediapipe>=0.10.11
+
+# ===== Narration (Phase 4) =====
+edge-tts>=6.1.10            # free Microsoft voices incl. en-IN-PrabhatNeural
+
+# ===== Reporting (Hybrid Briefing PDF) =====
+reportlab>=4.1.0            # PDF generation; pure Python, no system deps
+
 # ===== Utilities =====
 rich>=13.7.0                # Pretty terminal output
 tqdm>=4.66.0                # Progress bars

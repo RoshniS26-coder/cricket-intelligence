@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "match_id": "1276906",
+    "source": "https://www.espncricinfo.com/series/india-in-england-2022-1276893/england-vs-india-3rd-t20i-1276906/ball-by-ball-commentary",
+    "innings": "India",
+    "scope": "overs 0-1 only (12 balls, user-pasted)"
+  },
+  "balls": [
+    {
+      "over": 0, "ball_number": 1, "bowler": "Willey", "batter": "Rohit Sharma", "runs": 1,
+      "commentary": "Full, angling across to off stump, pushed to the left of mid-off",
+      "espn_fields": {"length": "full", "line": "off_stump", "movement": "swing", "shot_type": "drive", "footwork": "front_foot", "contact_quality": "clean", "shot_direction": "mid_off"}
+    },
+    {
+      "over": 0, "ball_number": 2, "bowler": "Willey", "batter": "Pant", "runs": 0,
+      "commentary": "Length ball straightening close to off stump. Presses forward and looks for the bunted single to the off side, but Willey moves quickly in his follow-through to cut it off",
+      "espn_fields": {"length": "good", "line": "off_stump", "movement": "swing", "shot_type": "front_foot_defence", "footwork": "front_foot", "contact_quality": "clean", "shot_direction": "mid_off"}
+    },
+    {
+      "over": 0, "ball_number": 3, "bowler": "Willey", "batter": "Pant", "runs": 0,
+      "commentary": "Length ball outside off, a hint of swing again, turns his wrists on top of the bounce to play it towards point. Almost a front-foot cut",
+      "espn_fields": {"length": "good", "line": "outside_off", "movement": "swing", "shot_type": "cut", "footwork": "front_foot", "contact_quality": "clean", "shot_direction": "point"}
+    },
+    {
+      "over": 0, "ball_number": 4, "bowler": "Willey", "batter": "Pant", "runs": 0,
+      "commentary": "Swing away from the left-hander again. Good length and outside off stump. Pant's bat is drawn away from his body - which isn't a big deal in T20 cricket, but he was trying to defend this. Beaten",
+      "espn_fields": {"length": "good", "line": "outside_off", "movement": "swing", "swing_direction": "out_swing", "shot_type": "front_foot_defence", "footwork": "front_foot", "contact_quality": "miss"}
+    },
+    {
+      "over": 0, "ball_number": 5, "bowler": "Willey", "batter": "Pant", "runs": 1,
+      "commentary": "Length ball on off stump now, uses his wrists nicely to work this to deep square leg",
+      "espn_fields": {"length": "good", "line": "off_stump", "shot_type": "flick", "contact_quality": "clean", "shot_direction": "deep_square_leg"}
+    },
+    {
+      "over": 0, "ball_number": 6, "bowler": "Willey", "batter": "Rohit Sharma", "runs": 0,
+      "commentary": "Length ball, swings back in towards off stump to cramp Rohit for room slightly. Defended to short extra-cover",
+      "espn_fields": {"length": "good", "line": "off_stump", "movement": "swing", "swing_direction": "in_swing", "shot_type": "front_foot_defence", "contact_quality": "clean", "shot_direction": "cover"}
+    },
+    {
+      "over": 1, "ball_number": 1, "bowler": "Topley", "batter": "Pant", "runs": 0,
+      "commentary": "And he strikes first ball. Is this lbw or caught-behind? A swipe across the line from Pant, and the ball ends up in the keeper's gloves. Replays show there was a faint inside edge onto his back leg. Pant c Buttler b Topley 1(5)",
+      "espn_fields": {"shot_type": "flick", "contact_quality": "edge", "edge_type": "inside_edge", "outcome": "wicket", "dismissal_type": "caught"}
+    },
+    {
+      "over": 1, "ball_number": 2, "bowler": "Topley", "batter": "Kohli", "runs": 0,
+      "commentary": "Back of a length, slanting across, hops to ride the bounce and punches into the covers",
+      "espn_fields": {"length": "short_of_length", "line": "off_stump", "shot_type": "back_foot_defence", "footwork": "back_foot", "contact_quality": "clean", "shot_direction": "cover"}
+    },
+    {
+      "over": 1, "ball_number": 3, "bowler": "Topley", "batter": "Kohli", "runs": 1,
+      "commentary": "Length ball angling across to off stump, shuffles across and works it away to deep square leg",
+      "espn_fields": {"length": "good", "line": "off_stump", "shot_type": "flick", "footwork": "front_foot", "contact_quality": "clean", "shot_direction": "deep_square_leg"}
+    },
+    {
+      "over": 1, "ball_number": 4, "bowler": "Topley", "batter": "Rohit Sharma", "runs": 0,
+      "commentary": "Length ball on off stump, a hint of shape back in, defended to short extra-cover",
+      "espn_fields": {"length": "good", "line": "off_stump", "movement": "swing", "swing_direction": "in_swing", "shot_type": "front_foot_defence", "contact_quality": "clean", "shot_direction": "cover"}
+    },
+    {
+      "over": 1, "ball_number": 5, "bowler": "Topley", "batter": "Rohit Sharma", "runs": 0,
+      "commentary": "Not quite short enough to pull, on top of off stump. Hits it hard into the ground and it goes to short midwicket",
+      "espn_fields": {"length": "short_of_length", "line": "off_stump", "shot_type": "drive", "contact_quality": "clean", "shot_direction": "mid_wicket"}
+    },
+    {
+      "over": 1, "ball_number": 6, "bowler": "Topley", "batter": "Rohit Sharma", "runs": 0,
+      "commentary": "Inswing again from Topley, but it's probably headed down leg, so only the faintest of lbw appeals after Rohit misses the flick",
+      "espn_fields": {"length": "good", "line": "leg", "movement": "swing", "swing_direction": "in_swing", "shot_type": "flick", "contact_quality": "miss"}
+    }
+  ]
+}
