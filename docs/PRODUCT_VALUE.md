@@ -244,6 +244,10 @@ This is the moment the dataset becomes a **product** instead of a **demo**.
 - **No AI commentary generation** — that's a downstream app someone could build *on top of* our DB
 - **No "AI captain" decision engine** — Phase 4 in the original spec; we're delivering the data layer that any such engine would need
 
+### Where RAG fits (and where it doesn't)
+
+**RAG is not our primary direction — SQL on the structured DB is.** ~90% of realistic franchise workflows (weakness zones, per-bowler matchups, scoring zones, phase splits, cross-match aggregation, pitch maps, wagon wheels) are exact structured queries that the 28-field `balls` table answers faster, cheaper, and more accurately than any vector retrieval could. Coaches and analysts don't ask *"show me dismissals commentators called unplayable"* — they ask *"who should bowl to Buttler in the death?"* That's a `GROUP BY` query, not a semantic search. Picking SQL over RAG here is the thoughtful-engineer choice, not the trend-chasing one. RAG becomes a justified **optional Phase 2 enhancement** in exactly two scenarios: (a) the **AI Coach product** if the coaching tutorial corpus grows past ~30 entries and the current prompt-injection approach stops fitting in context — RAG would then make drill recommendations specific and citable; and (b) a future **natural-language commentary search** feature for analysts if a customer specifically asks for it, where prose qualifiers like "unplayable" or "momentum-shifting" can't be expressed as SQL. Both are ~half-a-day local-only builds (sentence-transformers + SQLite, no new infra) and we'll ship them on demand, not pre-emptively. The structured DB is the moat — RAG is a query interface someone might bolt on for the prose-flavored 10% of questions.
+
 ---
 
 ## 10. Roadmap (alignment with the original 4-phase vision)
