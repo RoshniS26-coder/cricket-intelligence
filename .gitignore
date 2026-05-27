@@ -110,3 +110,7 @@ $RECYCLE.BIN/
 
 # ===== Personal automation (per-user, not for team) =====
 .claude/settings.local.json
+
+# ===== Benchmark — track code, ignore results =====
+benchmark/results/
+!benchmark/results/.gitkeep
