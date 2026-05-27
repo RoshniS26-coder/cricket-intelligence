@@ -86,7 +86,7 @@ export default function PrepPage() {
             {matchup.weakness_zones.length > 0 && (
               <div>
                 <p className="text-xs text-[var(--text-muted)] uppercase tracking-wide mb-3">Danger Zones in This Matchup</p>
-                <div className="max-w-xs">
+                <div className="max-w-sm">
                   <PitchHeatmap zones={matchup.weakness_zones} mode="danger" />
                 </div>
               </div>
