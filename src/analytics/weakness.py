@@ -72,14 +72,16 @@ def _crosstab_field(balls: list, field: str) -> dict[str, dict]:
         buckets[key].append(b)
     result = {}
     for key, group in buckets.items():
-        if len(group) >= _MIN_SAMPLE:
-            result[key] = _zone_stats(group)
+        if key == "unknown" or len(group) < _MIN_SAMPLE:
+            continue
+        result[key] = _zone_stats(group)
     return result
 
 
 def compute_weakness_profile(
     balls: list,
     batsman_name: str = "",
+    min_sample: int = _MIN_SAMPLE,
 ) -> dict:
     """
     Build a full weakness + strength profile from a list of BallDBRecord objects.
@@ -115,7 +117,9 @@ def compute_weakness_profile(
 
     zones = []
     for (line, length), group in zone_buckets.items():
-        if len(group) < _MIN_SAMPLE:
+        if len(group) < min_sample:
+            continue
+        if line == "unknown" or length == "unknown":
             continue
         stats = _zone_stats(group)
         zones.append({"line": line, "length": length, **stats})

@@ -55,10 +55,21 @@ Tier 1 — COPY VERBATIM from Cricsheet (never modify):
 Tier 2 — DERIVE from ESPN commentary (primary technique signal):
   line              : where the ball pitched relative to the stumps
                       (outside_off / off_stump / middle / leg / outside_leg)
+                      Direct cues: "outside off", "on the stumps", "on leg",
+                        "down leg", "on middle".
+                      Inferred cues (use when explicit line absent):
+                        shot hit "to the leg side" / "on leg" / "flicked" /
+                        "worked to leg" / "big shot to leg" → leg or middle;
+                        shot hit "through cover" / "through off side" /
+                        "driven off side" → off_stump or outside_off.
+                      Always infer from context rather than defaulting to unknown.
   length            : yorker / full / good / short_of_length / short
                       (cues: "full", "back of a length", "short", "yorker",
                        "fullish", "length ball", "half-volley"=full,
-                       "bouncer"=short)
+                       "bouncer"=short,
+                       "toe-end of the bat" / "toe end" / "mistimed reaching
+                        for it" → full or good,
+                       "hit the splice" / "top edge on the pull" → short)
   variation         : none / slower / cutter / bouncer / yorker / spin_variation
                       (cues: "slower ball", "cutter", "bouncer", "googly",
                        "doosra"; "none" if stock delivery)
@@ -201,7 +212,10 @@ CONFIDENCE per field (0.0-1.0):
    Don't copy verbatim; paraphrase the key action.
 9. For wickets, dismissal_type comes from Cricsheet (already accurate);
    use ESPN to fill HOW it fell in raw_description.
-10. Never invent details. Better "unknown" than wrong.
+10. Prefer inference over "unknown". If ESPN describes the shot direction,
+    contact point, or batter's movement, USE that to infer line/length/footwork
+    even when not stated explicitly. Reserve "unknown" only when there is
+    genuinely no basis for inference at all.
 """
 
 
