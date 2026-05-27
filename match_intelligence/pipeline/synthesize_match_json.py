@@ -13,7 +13,7 @@ balls to gemini-2.5-pro (TEXT ONLY) and merges the response. Writes
 per-over outputs to a resume directory so a partial run can be continued.
 
 Usage:
-  python features/ball_extraction/synthesize_match_json.py \\
+  python match_intelligence/pipeline/synthesize_match_json.py \\
       --cricsheet-json data/cricsheet/IndvsEng/india_innings.json \\
       --espn-commentary data/espncricinfo/IndvsEng/match_1276906_commentary.json \\
       --gemini-video-glob 'data/IndvsEng_chunk*_with_cricsheet.json' \\
