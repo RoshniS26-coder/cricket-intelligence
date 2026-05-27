@@ -11,6 +11,7 @@ import { Target, Crosshair } from "lucide-react"
 const TEAMS = ["India", "England"]
 
 function fmt(v: string) { return v.replace(/_/g, " ") }
+function fmtField(v: string) { return (!v || v === "unknown") ? null : fmt(v) }
 
 export default function PrepPage() {
   const [team, setTeam] = useState<string>(TEAMS[0])
@@ -99,7 +100,9 @@ export default function PrepPage() {
                       className="text-xs bg-[var(--bg-muted)] rounded px-3 py-1.5 flex gap-3 border border-[var(--border)]"
                     >
                       <span className="font-mono text-[var(--text-muted)] shrink-0">{b.over}.{b.ball}</span>
-                      <span className="text-[var(--text-secondary)] shrink-0">{fmt(b.line)} / {fmt(b.length)}</span>
+                      <span className="text-[var(--text-secondary)] shrink-0">
+                        {[fmtField(b.line), fmtField(b.length)].filter(Boolean).join(" / ") || "—"}
+                      </span>
                       <span className={`shrink-0 ${b.outcome === "wicket" ? "text-red-500 font-medium" : "text-[var(--text-primary)]"}`}>
                         {b.outcome}
                       </span>
