@@ -16,7 +16,7 @@ For any T20 or ODI match in the corpus:
 | **Pitch map** | 5×5 line × length frequency heatmap, per batsman |
 | **Wagon wheel** | 8-zone polar scoring chart, per batsman, auto-mirrored for LHB |
 | **Weakness heatmap** | Per-cell danger score (dismissals + runs suppressed), highlighting exploitable zones |
-| **Streamlit UI** | Browse the DB, export rich CSVs, view weakness analysis per batter |
+| **Next.js UI** | Browse the DB, export CSVs, review ball records, view weakness analysis per batter |
 
 ## How it works
 
@@ -108,8 +108,8 @@ python match_intelligence/reports/generate_heatmaps.py \
     --match-id $MATCH_ID --innings <n> \
     --out-dir data/heatmaps/match_${MATCH_ID}_innings_<n>
 
-# 10. Browse in Streamlit UI
-streamlit run ui/app.py
+# 10. Start the Next.js UI
+cd frontend && npm run dev
 ```
 
 ## Project layout
@@ -139,7 +139,7 @@ cricket-intelligence/
 │   └── report/                   ← PDF / TTS / video mux
 │
 ├── scripts/                   ← shared ops (load_synth_to_db, db_migrations)
-├── ui/app.py                  ← Streamlit UI (serves both products)
+├── frontend/                  ← Next.js UI (weakness analysis, ball review, data export)
 ├── data/                      ← match data + DB (large files .gitignored)
 ├── docs/                      ← architecture, schema, heatmaps explainer
 ├── tests/                     ← pytest
