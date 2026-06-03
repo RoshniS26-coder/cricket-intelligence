@@ -12,15 +12,19 @@ You are about to update `docs/project_context.md` with a session summary.
    - Today's date (from system date — use it verbatim, do not guess)
    - Run `git status --short` to see what files changed this session
    - Run `git log --oneline -5` to see recent commits (if any commits happened)
-   - Query the DB for current state:
+   - Query the **active DB (Neon Postgres via `DATABASE_URL`)** for current
+     state — NOT the legacy SQLite file, which is not kept in sync:
      ```bash
-     sqlite3 data/cricket_intelligence.db "
-     SELECT match_id, innings, COUNT(*) AS balls
-     FROM balls
-     GROUP BY match_id, innings
-     ORDER BY match_id, innings;
-     "
+     python -c "
+import os, sqlalchemy as sa
+from dotenv import load_dotenv; load_dotenv('.env')   # explicit path: find_dotenv() fails under stdin/heredoc
+e = sa.create_engine(os.environ['DATABASE_URL'])
+with e.connect() as c:
+    for r in c.execute(sa.text('SELECT match_id, innings, COUNT(*) AS balls FROM balls GROUP BY match_id, innings ORDER BY match_id, innings')):
+        print(r.match_id, r.innings, r.balls)
+"
      ```
+     (Or just run `/db-status`, which prints the same plus coverage.)
    - Note any new files in `data/`, `features/`, `src/`, `docs/`, `scripts/`, `ui/`
 
 3. **Write a new entry at the TOP** of the `## Current state` section. The existing

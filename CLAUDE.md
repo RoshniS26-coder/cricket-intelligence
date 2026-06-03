@@ -38,12 +38,22 @@ under `match_id={cricsheet_match_id}` with **innings-qualified ball_ids**
 (`{match_id}_i{innings}_{over}_{ball}`) to prevent collisions between
 the two innings of the same match.
 
-### Cost per match
-- Text-only (ESPN + Cricsheet): ~$0.50 + ~17 min wall time per innings
-- + video pass (gemini-3.1-pro on chunks): ~$5-6 + ~2-3 hrs extra per innings
+### Cost + time per match  (use `/gemini-cost <hours>` for a quick estimate)
 
-Recommended default: text-only for everything; add video selectively
-for matches where bowler-side speed/crease analysis is the deliverable.
+| Pass | Model | Cost | Wall time |
+|------|-------|------|-----------|
+| Text-only (ESPN + Cricsheet) | gemini-2.5-pro | ~$0.50 / innings | ~17 min / innings |
+| + video pass (chunks) | gemini-3.1-pro | ~$5–6 / innings | ~2–3 hrs / innings |
+
+Rule of thumb for video: roughly **$1.3–1.5 per video-hour** on
+gemini-3.1-pro; a full 4-hr T20 broadcast ≈ $5–6 and several hours wall time.
+
+**Recommended default: text-only for everything.** Only add the video pass
+when bowler-side speed/crease is the explicit deliverable. Do NOT reach for
+video segmentation / OCR otherwise — that path is retired (see `archive/`).
+
+**Model-overload fallback:** if `gemini-2.5-pro` returns "model is overloaded",
+retry with `gemini-3.1-flash` (the synthesis/report flags accept `--model`).
 
 ---
 
@@ -162,9 +172,20 @@ cricket-intelligence/
 
 ---
 
-## Database schema (high level)
+## Database (active backend + schema)
 
-Two tables in `data/cricket_intelligence.db`:
+**Active store: Neon Postgres.** The app connects via the `DATABASE_URL`
+env var (a `postgresql://…` Neon connection string in `.env`). All loads,
+reports, the API, and the frontend read/write **Neon** — this is the source
+of truth.
+
+The local `data/cricket_intelligence.db` SQLite file is a **legacy/offline
+fallback** only (it's what `src/storage/db.py` uses when `DATABASE_URL` is
+unset). It is *not* kept in sync with Neon — do not trust it for "what's
+loaded" questions, and do not query it to verify data. Use `/db-status`
+(or query Neon directly via `DATABASE_URL`).
+
+Two tables (same schema on both backends):
 
 - **`matches`** — `match_id` (PK), format, team_a, team_b, venue, date
 - **`balls`** — `ball_id` (PK, format: `{match_id}_i{innings}_{over}_{ball_number}`),
@@ -179,11 +200,14 @@ See `src/storage/db.py` and `src/intelligence/schema.py` for full
 column definitions and enums.
 
 ### Current contents (refresh in `docs/project_context.md` after each session)
-At the time CLAUDE.md was last hand-edited, the DB contained:
-- **1 match** (`1276906` — ENG vs IND, 3rd T20I, Trent Bridge, Jul 2022)
-- **240 ball rows** (innings 1: 120, innings 2: 120)
+As of 2026-06-03, Neon contained **6 matches / 12 innings / 1,334 ball rows**:
+`1276906` (2022 Trent Bridge) plus the 2025 IND vs ENG series
+(`1439899–1439903`), loaded via `scripts/load_all_2025.sh`. Some 2nd innings are
+short (<120) where the chase ended early. Counts drift as matches are added —
+never treat this number as live.
 
-For up-to-date state, see `docs/project_context.md`.
+For the live count, run `/db-status` (queries Neon). For the session-by-session
+narrative, see `docs/project_context.md`.
 
 ---
 
@@ -227,9 +251,17 @@ For up-to-date state, see `docs/project_context.md`.
 import from `match_intelligence.*` (currently doesn't). Both freely use `src/`.
 
 ### Git
-- Branch: `main` (no PR workflow established yet — direct commits)
-- Don't commit `data/raw_videos/*.mp4` (big files; tracked via `.gitignore`)
-- Don't commit `data/cricket_intelligence.db` if it gets large — currently small enough
+- **Remote:** `origin` = `github.com/RoshniS26-coder/cricket-intelligence`
+  (both fetch and push). The old `roshnifreerange/cricket-intelligence` repo
+  is **deprecated/deleted** — never push or fetch from it. If a push is denied
+  with "Permission to RoshniS26-coder denied to roshnifreerange", the wrong
+  account is authenticated (`gh auth status` / `gh auth switch`).
+- **Identity:** commits must be authored as `RoshniS26-coder
+  <roshni@sorigin.com>`, not the legacy `roshnifreerange` identity.
+- **Branch:** `main` is the working branch (direct commits, no PR workflow).
+  Feature branches optional; remember they exist only locally until pushed.
+- Don't commit `data/raw_videos/*.mp4` (big files; in `.gitignore`).
+- `benchmark_archive/` is gitignored on purpose — never re-track it.
 
 ---
 
